@@ -10,15 +10,16 @@ import ProfilDesa from "./pages/public/ProfilDesa";
 import Pemerintahan from "./pages/public/Pemerintahan";
 import InformasiPublik from "./pages/public/InformasiPublik";
 import Kegiatan from "./pages/public/Kegiatan";
+import InfografisPublik from "./pages/public/InfografisPublik";
 
 // Pages: Admin (Dashboard & Fitur)
 import Dashboard from "./pages/admin/Dashboard";
-import Infografis from "./pages/admin/Infografis"; 
-import KegiatanDesa from "./pages/admin/KegiatanDesa"; 
-import Berita from "./pages/admin/Berita"; 
-import APBdes from "./pages/admin/APBdes"; 
-import Ppid from "./pages/admin/Ppid"; 
-import Idm from "./pages/admin/Idm"; 
+import Infografis from "./pages/admin/Infografis";
+import KegiatanDesa from "./pages/admin/KegiatanDesa";
+import Berita from "./pages/admin/Berita";
+import APBdes from "./pages/admin/APBdes";
+import Ppid from "./pages/admin/Ppid";
+import Idm from "./pages/admin/Idm";
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="pemerintahan" element={<Pemerintahan />} />
           <Route path="informasi-publik" element={<InformasiPublik />} />
           <Route path="kegiatan" element={<Kegiatan />} />
+          <Route path="infografis" element={<InfografisPublik />} />
         </Route>
 
         {/* ======================================= */}
@@ -57,7 +59,9 @@ export default function App() {
           path="*"
           element={
             <div className="flex items-center justify-center min-h-screen">
-              <h1 className="text-3xl font-bold text-slate-400">404 - Halaman Tidak Ditemukan</h1>
+              <h1 className="text-3xl font-bold text-slate-400">
+                404 - Halaman Tidak Ditemukan
+              </h1>
             </div>
           }
         />
