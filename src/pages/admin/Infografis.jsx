@@ -1,192 +1,661 @@
-import React from "react";
-import { Search, Bell, Plus } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  Search,
+  Bell,
+  Trash2,
+  PlusCircle,
+  Edit,
+  Map,
+  CheckCircle,
+  Users,
+} from "lucide-react";
+
+// Sesuaikan API URL dengan backend Anda (misalnya /statistic/dusun)
+const API_URL = `${import.meta.env.VITE_API_URL}/statistic/dusun`;
 
 export default function Infografis() {
-  const data = [
-    {
-      dusun: "Sibarani Toruan",
-      u05: 41,
-      u612: 61,
-      u1316: 63,
-      u17plus: 375,
-      total: 540,
-    },
-    {
-      dusun: "Sibarani Dolok",
-      u05: 24,
-      u612: 103,
-      u1316: 60,
-      u17plus: 331,
-      total: 518,
-    },
-    {
-      dusun: "Sibarani Namungkup",
-      u05: 26,
-      u612: 26,
-      u1316: 29,
-      u17plus: 151,
-      total: 232,
-    },
-    {
-      dusun: "Perumahan Korpri",
-      u05: 44,
-      u612: 71,
-      u1316: 68,
-      u17plus: 399,
-      total: 582,
-    },
-  ];
+  const [view, setView] = useState("list");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [activeTab, setActiveTab] = useState("dasar"); // State untuk Tab Form
+
+  const [dusunList, setDusunList] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // =========================================================================
+  // 🔥 TEMPLATE STATIS (OPSI A): Admin tinggal isi angkanya saja!
+  // =========================================================================
+  const initialFormState = {
+    id: "", // Contoh: D01
+    nama_dusun: "",
+    penduduk_laki: 0,
+    penduduk_perempuan: 0,
+    agamas: [
+      { agama: "Islam", jumlah_jiwa: 0 },
+      { agama: "Kristen", jumlah_jiwa: 0 },
+      { agama: "Katolik", jumlah_jiwa: 0 },
+      { agama: "Hindu", jumlah_jiwa: 0 },
+      { agama: "Buddha", jumlah_jiwa: 0 },
+    ],
+    perkawinans: [
+      { status_perkawinan: "Belum Kawin", jumlah_jiwa: 0 },
+      { status_perkawinan: "Kawin", jumlah_jiwa: 0 },
+      { status_perkawinan: "Cerai Hidup", jumlah_jiwa: 0 },
+      { status_perkawinan: "Cerai Mati", jumlah_jiwa: 0 },
+    ],
+    usias: [
+      { kelompok_usia: "0 - 4 Tahun (Balita)", jumlah_jiwa: 0 },
+      { kelompok_usia: "5 - 14 Tahun (Anak)", jumlah_jiwa: 0 },
+      { kelompok_usia: "15 - 39 Tahun (Pemuda)", jumlah_jiwa: 0 },
+      { kelompok_usia: "40 - 64 Tahun (Dewasa)", jumlah_jiwa: 0 },
+      { kelompok_usia: "65 Tahun Keatas (Lansia)", jumlah_jiwa: 0 },
+    ],
+    pendidikans: [
+      { tingkat_pendidikan: "Tidak/Belum Sekolah", jumlah_jiwa: 0 },
+      { tingkat_pendidikan: "Tamat SD/Sederajat", jumlah_jiwa: 0 },
+      { tingkat_pendidikan: "Tamat SMP/Sederajat", jumlah_jiwa: 0 },
+      { tingkat_pendidikan: "Tamat SMA/Sederajat", jumlah_jiwa: 0 },
+      { tingkat_pendidikan: "Diploma / Sarjana (S1/S2/S3)", jumlah_jiwa: 0 },
+    ],
+    pekerjaans: [
+      { jenis_pekerjaan: "Belum/Tidak Bekerja", jumlah_jiwa: 0 },
+      { jenis_pekerjaan: "Mengurus Rumah Tangga", jumlah_jiwa: 0 },
+      { jenis_pekerjaan: "Pelajar/Mahasiswa", jumlah_jiwa: 0 },
+      { jenis_pekerjaan: "PNS/TNI/Polri", jumlah_jiwa: 0 },
+      { jenis_pekerjaan: "Wiraswasta / Pengusaha", jumlah_jiwa: 0 },
+      { jenis_pekerjaan: "Karyawan Swasta", jumlah_jiwa: 0 },
+      { jenis_pekerjaan: "Petani/Pekebun", jumlah_jiwa: 0 },
+      { jenis_pekerjaan: "Buruh Harian Lepas", jumlah_jiwa: 0 },
+      { jenis_pekerjaan: "Pekerjaan Lainnya", jumlah_jiwa: 0 },
+    ],
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
+  const token = localStorage.getItem("token");
+  const axiosConfig = { headers: { Authorization: `Bearer ${token}` } };
+
+  const fetchDusun = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(API_URL, axiosConfig);
+      setDusunList(response.data.data);
+    } catch (error) {
+      console.error("Gagal mengambil data Dusun:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDusun();
+  }, []);
+
+  // 1. Handle Input untuk Kolom Biasa (Nama Dusun, Penduduk L/P)
+  const handleBasicChange = (e) => {
+    const { name, value } = e.target;
+    // Jika input adalah penduduk laki/perempuan, pastikan integer
+    if (name === "penduduk_laki" || name === "penduduk_perempuan") {
+      const numValue = value.replace(/\D/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        [name]: numValue === "" ? 0 : parseInt(numValue, 10),
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  // 2. Handle Input untuk Kolom Array (Agama, Usia, dll)
+  const handleArrayChange = (
+    kategoriArray,
+    indexTarget,
+    keyValue,
+    newValue,
+  ) => {
+    // Buang huruf/minus, pastikan hanya integer
+    const rawValue = newValue.replace(/\D/g, "");
+    const finalValue = rawValue === "" ? 0 : parseInt(rawValue, 10);
+
+    setFormData((prev) => {
+      const arrayBaru = [...prev[kategoriArray]];
+      arrayBaru[indexTarget][keyValue] = finalValue;
+      return { ...prev, [kategoriArray]: arrayBaru };
+    });
+  };
+
+  const handleAdd = () => {
+    setSelectedItem(null);
+    setFormData(initialFormState);
+    setActiveTab("dasar");
+    setView("form");
+  };
+
+  const handleEdit = (item) => {
+    setSelectedItem(item);
+
+    // Proses merging: Jika ada struktur baru di template, kita gabungkan agar aman
+    // Ini berguna jika backend mereturn data yang kurang lengkap
+    const mergedData = { ...initialFormState, ...item, id: item.id };
+
+    // Memastikan array yang kosong diganti dengan template agar UI tidak rusak
+    if (!item.agamas || item.agamas.length === 0)
+      mergedData.agamas = initialFormState.agamas;
+    if (!item.usias || item.usias.length === 0)
+      mergedData.usias = initialFormState.usias;
+    if (!item.pendidikans || item.pendidikans.length === 0)
+      mergedData.pendidikans = initialFormState.pendidikans;
+    if (!item.pekerjaans || item.pekerjaans.length === 0)
+      mergedData.pekerjaans = initialFormState.pekerjaans;
+    if (!item.perkawinans || item.perkawinans.length === 0)
+      mergedData.perkawinans = initialFormState.perkawinans;
+
+    setFormData(mergedData);
+    setActiveTab("dasar");
+    setView("form");
+  };
+
+  const handleSave = async () => {
+    if (!formData.id || !formData.nama_dusun) {
+      alert("Kode Dusun / Nama Dusun wajib diisi (Pilih pada Tab Info Dasar)!");
+      return;
+    }
+
+    try {
+      if (selectedItem) {
+        const payload = { ...formData, _method: "PUT" };
+        await axios.post(`${API_URL}/${selectedItem.id}`, payload, axiosConfig);
+      } else {
+        await axios.post(API_URL, formData, axiosConfig);
+      }
+      fetchDusun();
+      setView("list");
+    } catch (error) {
+      console.error("Gagal menyimpan data:", error);
+      alert(
+        error.response?.data?.message ||
+          "Terjadi kesalahan saat menyimpan data Dusun!",
+      );
+    }
+  };
+
+  const confirmDelete = (item) => {
+    setSelectedItem(item);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${API_URL}/${selectedItem.id}`, axiosConfig);
+      fetchDusun();
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error("Gagal menghapus data:", error);
+    }
+  };
 
   return (
-    <div className="bg-[#f8fafc] min-h-screen p-8 font-sans text-slate-800">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-xl font-bold text-[#064e3b]">
-          Infografis Desa Sibarani Nasampulu
-        </h1>
-
-        <div className="flex items-center gap-6">
-          <button className="flex items-center gap-2 bg-[#52a77b] hover:bg-[#438a65] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-            <Plus size={18} />
-            Import Data Statistik
-          </button>
-        </div>
-      </div>
-
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Donut Chart Card */}
-        <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-100 h-80">
-          <h2 className="text-sm font-semibold mb-1">
-            Distribusi Penduduk Berdasarkan Usia
-          </h2>
-          <div className="mb-6">
-            <span className="text-4xl font-bold text-[#1e40af]">1.872</span>
-            <span className="text-slate-500 ml-2">Jiwa</span>
-            <p className="text-xs text-slate-400 font-medium">Total Penduduk</p>
+    <div className="min-h-screen bg-gray-50 font-sans text-slate-700 pb-10">
+      <main className="flex flex-col p-8">
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-xl font-bold text-teal-900">
+            Infografis & Demografi Dusun
+          </h1>
+          <div className="flex items-center gap-4">
+            {/* Header Profile Icon dll */}
           </div>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <div className="relative w-32 h-32 flex items-center justify-center">
-              {/* Simplified SVG Ring representation */}
-              <svg
-                viewBox="0 0 36 36"
-                className="w-full h-full transform -rotate-90"
+        {view === "list" ? (
+          <>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold text-teal-900">
+                Daftar Dusun & Total Penduduk
+              </h2>
+              <button
+                onClick={handleAdd}
+                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition shadow-md font-bold"
               >
-                <circle
-                  cx="18"
-                  cy="18"
-                  r="15.9"
-                  fill="transparent"
-                  stroke="#7c89f8"
-                  strokeWidth="4"
-                  strokeDasharray="50 100"
-                />
-                <circle
-                  cx="18"
-                  cy="18"
-                  r="15.9"
-                  fill="transparent"
-                  stroke="#f472b6"
-                  strokeWidth="4"
-                  strokeDasharray="15 100"
-                  strokeDashoffset="-50"
-                />
-                <circle
-                  cx="18"
-                  cy="18"
-                  r="15.9"
-                  fill="transparent"
-                  stroke="#a78bfa"
-                  strokeWidth="4"
-                  strokeDasharray="35 100"
-                  strokeDashoffset="-65"
-                />
-              </svg>
+                <PlusCircle className="w-5 h-5" /> Tambah Dusun
+              </button>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-[10px] font-bold">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#7c89f8]"></div>{" "}
-                0-5 Tahun{" "}
-                <span className="text-slate-400 font-normal">50%</span>
+
+            {/* TABEL LIST */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-emerald-50 text-emerald-900 text-sm">
+                    <th className="p-4 text-center">Kode</th>
+                    <th className="p-4">Nama Dusun</th>
+                    <th className="p-4 text-center">Laki-Laki</th>
+                    <th className="p-4 text-center">Perempuan</th>
+                    <th className="p-4 text-center">Total Penduduk</th>
+                    <th className="p-4 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {loading ? (
+                    <tr>
+                      <td colSpan="6" className="p-4 text-center">
+                        Loading data...
+                      </td>
+                    </tr>
+                  ) : dusunList.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="p-4 text-center">
+                        Belum ada data Dusun.
+                      </td>
+                    </tr>
+                  ) : (
+                    dusunList.map((item) => (
+                      <tr
+                        key={item.id}
+                        className="hover:bg-gray-50 text-sm transition"
+                      >
+                        <td className="p-4 text-center font-black text-teal-900">
+                          {item.id}
+                        </td>
+                        <td className="p-4 font-bold text-base">
+                          {item.nama_dusun}
+                        </td>
+                        <td className="p-4 text-center text-blue-600 font-semibold">
+                          {item.penduduk_laki} Jiwa
+                        </td>
+                        <td className="p-4 text-center text-pink-600 font-semibold">
+                          {item.penduduk_perempuan} Jiwa
+                        </td>
+                        <td className="p-4 text-center font-bold text-emerald-600 text-lg">
+                          {item.total_penduduk}
+                        </td>
+                        <td className="p-4">
+                          <div className="flex justify-center gap-3">
+                            <Edit
+                              className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-500"
+                              onClick={() => handleEdit(item)}
+                              title="Ubah Data Demografi"
+                            />
+                            <Trash2
+                              className="w-5 h-5 text-gray-400 cursor-pointer hover:text-red-500"
+                              onClick={() => confirmDelete(item)}
+                              title="Hapus Dusun"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        ) : (
+          /* ========================================= */
+          /* FORM TAMBAH / EDIT DENGAN SISTEM TABS     */
+          /* ========================================= */
+          <div className="animate-in fade-in duration-300 max-w-5xl mx-auto w-full">
+            <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <div className="flex items-center gap-3 text-teal-900 font-bold">
+                <Map className="w-6 h-6" />
+                <h2>
+                  {selectedItem
+                    ? `Ubah Demografi: ${selectedItem.nama_dusun}`
+                    : "Input Data Dusun & Demografi Baru"}
+                </h2>
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#f472b6]"></div>{" "}
-                6-12 Tahun{" "}
-                <span className="text-slate-400 font-normal">15%</span>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setView("list")}
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-6 py-2 rounded-lg font-bold transition"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-lg shadow-md transition font-bold"
+                >
+                  <CheckCircle className="w-5 h-5" /> Simpan Data
+                </button>
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#a78bfa]"></div>{" "}
-                13-16 Tahun{" "}
-                <span className="text-slate-400 font-normal">35%</span>
+            </div>
+
+            {/* NAVIGASI TABS */}
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+              {[
+                { id: "dasar", label: "Info Dasar" },
+                { id: "agama", label: "Agama & Perkawinan" },
+                { id: "usia", label: "Usia" },
+                { id: "pendidikan", label: "Pendidikan" },
+                { id: "pekerjaan", label: "Pekerjaan" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-6 py-3 rounded-full font-bold text-sm transition-all whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? "bg-teal-900 text-white shadow-md"
+                      : "bg-white text-gray-500 hover:bg-gray-100 border border-gray-200"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* AREA FORM BERDASARKAN TAB AKTIF */}
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+              {/* TAB 1: DASAR */}
+              {activeTab === "dasar" && (
+                <div className="grid grid-cols-2 gap-8 animate-in slide-in-from-right-4 duration-300">
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-gray-800 border-b pb-2 mb-4">
+                      Profil Dusun
+                    </h3>
+
+                    {/* 🔥 DI SINI PERUBAHANNYA: Menggunakan Select Dropdown */}
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">
+                        Pilih Dusun
+                      </label>
+                      <select
+                        name="id"
+                        value={formData.id}
+                        disabled={!!selectedItem} // Tidak bisa ganti dusun kalau sedang mode Edit
+                        onChange={(e) => {
+                          const selectedId = e.target.value;
+                          const namaDusun =
+                            e.target.options[e.target.selectedIndex].text;
+                          setFormData((prev) => ({
+                            ...prev,
+                            id: selectedId,
+                            nama_dusun: namaDusun,
+                          }));
+                        }}
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 ring-emerald-400 font-bold cursor-pointer disabled:opacity-50"
+                      >
+                        <option value="" disabled>
+                          -- Pilih Dusun --
+                        </option>
+                        <option value="D01">Dusun 1</option>
+                        <option value="D02">Dusun 2</option>
+                        <option value="D03">Dusun 3</option>
+                        <option value="D04">Dusun 4</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-gray-800 border-b pb-2 mb-4">
+                      Total Penduduk (Master)
+                    </h3>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2 text-blue-600">
+                        Penduduk Laki-Laki (Jiwa)
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        name="penduduk_laki"
+                        value={
+                          formData.penduduk_laki === 0
+                            ? ""
+                            : formData.penduduk_laki
+                        }
+                        onChange={handleBasicChange}
+                        placeholder="0"
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 ring-blue-400 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2 text-pink-600">
+                        Penduduk Perempuan (Jiwa)
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        name="penduduk_perempuan"
+                        value={
+                          formData.penduduk_perempuan === 0
+                            ? ""
+                            : formData.penduduk_perempuan
+                        }
+                        onChange={handleBasicChange}
+                        placeholder="0"
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 ring-pink-400 font-bold"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: AGAMA & PERKAWINAN */}
+              {activeTab === "agama" && (
+                <div className="grid grid-cols-2 gap-10 animate-in slide-in-from-right-4 duration-300">
+                  <div>
+                    <h3 className="font-bold text-emerald-800 border-b-2 border-emerald-500 pb-2 mb-4 flex items-center gap-2">
+                      <Users className="w-5 h-5" /> Demografi Agama
+                    </h3>
+                    {formData.agamas.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center mb-3 bg-slate-50 p-2 rounded-lg border border-slate-100"
+                      >
+                        <span className="font-semibold text-sm text-slate-700 w-1/2">
+                          {item.agama}
+                        </span>
+                        <div className="flex items-center gap-2 w-1/2">
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={
+                              item.jumlah_jiwa === 0 ? "" : item.jumlah_jiwa
+                            }
+                            placeholder="0"
+                            onChange={(e) =>
+                              handleArrayChange(
+                                "agamas",
+                                index,
+                                "jumlah_jiwa",
+                                e.target.value,
+                              )
+                            }
+                            className="w-full p-2 border border-slate-200 rounded-md text-center outline-none focus:ring-2 ring-emerald-400"
+                          />
+                          <span className="text-xs text-slate-400 font-bold">
+                            Jiwa
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-blue-800 border-b-2 border-blue-500 pb-2 mb-4 flex items-center gap-2">
+                      <Users className="w-5 h-5" /> Status Perkawinan
+                    </h3>
+                    {formData.perkawinans.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center mb-3 bg-slate-50 p-2 rounded-lg border border-slate-100"
+                      >
+                        <span className="font-semibold text-sm text-slate-700 w-1/2">
+                          {item.status_perkawinan}
+                        </span>
+                        <div className="flex items-center gap-2 w-1/2">
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={
+                              item.jumlah_jiwa === 0 ? "" : item.jumlah_jiwa
+                            }
+                            placeholder="0"
+                            onChange={(e) =>
+                              handleArrayChange(
+                                "perkawinans",
+                                index,
+                                "jumlah_jiwa",
+                                e.target.value,
+                              )
+                            }
+                            className="w-full p-2 border border-slate-200 rounded-md text-center outline-none focus:ring-2 ring-blue-400"
+                          />
+                          <span className="text-xs text-slate-400 font-bold">
+                            Jiwa
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: USIA */}
+              {activeTab === "usia" && (
+                <div className="max-w-xl mx-auto animate-in slide-in-from-right-4 duration-300">
+                  <h3 className="font-bold text-orange-800 border-b-2 border-orange-500 pb-2 mb-4">
+                    Demografi Berdasarkan Rentang Usia
+                  </h3>
+                  {formData.usias.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center mb-3 bg-slate-50 p-3 rounded-lg border border-slate-100"
+                    >
+                      <span className="font-semibold text-sm text-slate-700 w-2/3">
+                        {item.kelompok_usia}
+                      </span>
+                      <div className="flex items-center gap-2 w-1/3">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={item.jumlah_jiwa === 0 ? "" : item.jumlah_jiwa}
+                          placeholder="0"
+                          onChange={(e) =>
+                            handleArrayChange(
+                              "usias",
+                              index,
+                              "jumlah_jiwa",
+                              e.target.value,
+                            )
+                          }
+                          className="w-full p-2 border border-slate-200 rounded-md text-center outline-none focus:ring-2 ring-orange-400 font-bold"
+                        />
+                        <span className="text-xs text-slate-400 font-bold">
+                          Jiwa
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* TAB 4: PENDIDIKAN */}
+              {activeTab === "pendidikan" && (
+                <div className="max-w-xl mx-auto animate-in slide-in-from-right-4 duration-300">
+                  <h3 className="font-bold text-purple-800 border-b-2 border-purple-500 pb-2 mb-4">
+                    Tingkat Pendidikan Terakhir
+                  </h3>
+                  {formData.pendidikans.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center mb-3 bg-slate-50 p-3 rounded-lg border border-slate-100"
+                    >
+                      <span className="font-semibold text-sm text-slate-700 w-2/3">
+                        {item.tingkat_pendidikan}
+                      </span>
+                      <div className="flex items-center gap-2 w-1/3">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={item.jumlah_jiwa === 0 ? "" : item.jumlah_jiwa}
+                          placeholder="0"
+                          onChange={(e) =>
+                            handleArrayChange(
+                              "pendidikans",
+                              index,
+                              "jumlah_jiwa",
+                              e.target.value,
+                            )
+                          }
+                          className="w-full p-2 border border-slate-200 rounded-md text-center outline-none focus:ring-2 ring-purple-400 font-bold"
+                        />
+                        <span className="text-xs text-slate-400 font-bold">
+                          Jiwa
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* TAB 5: PEKERJAAN */}
+              {activeTab === "pekerjaan" && (
+                <div className="max-w-xl mx-auto animate-in slide-in-from-right-4 duration-300">
+                  <h3 className="font-bold text-rose-800 border-b-2 border-rose-500 pb-2 mb-4">
+                    Mata Pencaharian Pokok
+                  </h3>
+                  {formData.pekerjaans.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center mb-2 bg-slate-50 p-2 rounded-lg border border-slate-100"
+                    >
+                      <span className="font-semibold text-sm text-slate-700 w-2/3">
+                        {item.jenis_pekerjaan}
+                      </span>
+                      <div className="flex items-center gap-2 w-1/3">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={item.jumlah_jiwa === 0 ? "" : item.jumlah_jiwa}
+                          placeholder="0"
+                          onChange={(e) =>
+                            handleArrayChange(
+                              "pekerjaans",
+                              index,
+                              "jumlah_jiwa",
+                              e.target.value,
+                            )
+                          }
+                          className="w-full p-2 border border-slate-200 rounded-md text-center outline-none focus:ring-2 ring-rose-400 font-bold"
+                        />
+                        <span className="text-xs text-slate-400 font-bold">
+                          Jiwa
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* MODAL HAPUS */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white p-10 rounded-[40px] shadow-2xl max-w-lg w-full text-center">
+              <h2 className="text-3xl font-black text-teal-900 mb-2">
+                Hapus Dusun?
+              </h2>
+              <p className="text-teal-800 mb-8 font-medium">
+                Dusun <b>{selectedItem?.nama_dusun}</b> beserta seluruh data
+                statistik demografinya akan dihapus selamanya.
+              </p>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={handleDelete}
+                  className="bg-green-400 hover:bg-green-500 text-white font-bold px-10 py-3 rounded-xl transition"
+                >
+                  Ya, Hapus
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold px-10 py-3 rounded-xl transition"
+                >
+                  Batal
+                </button>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Bar Chart Card */}
-        <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-100">
-          <h2 className="text-sm font-semibold mb-8">
-            Jumlah penduduk per dusun
-          </h2>
-          <div className="relative h-48 flex items-end justify-between px-4 border-b border-dashed border-slate-200">
-            {/* Simple Bar Chart Mockup */}
-            {data.map((item, index) => (
-              <div key={index} className="flex flex-col items-center w-full">
-                <span className="text-[10px] text-slate-500 mb-1">
-                  {item.total}
-                </span>
-                <div
-                  className="bg-[#52a77b] w-8 rounded-t-sm transition-all hover:opacity-80"
-                  style={{ height: `${(item.total / 600) * 100}%` }}
-                ></div>
-                <span className="text-[9px] text-slate-400 mt-2 absolute -bottom-8 text-center">
-                  {item.dusun}
-                </span>
-              </div>
-            ))}
-            {/* Grid Lines */}
-            <div className="absolute left-0 right-0 top-0 border-t border-dashed border-slate-100"></div>
-            <div className="absolute left-0 right-0 top-1/2 border-t border-dashed border-slate-100"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Table Section */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-slate-100">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-[#ecfdf5] text-[#065f46] font-medium">
-            <tr>
-              <th className="px-6 py-4">Dusun</th>
-              <th className="px-6 py-4 text-center font-bold">0-5</th>
-              <th className="px-6 py-4 text-center font-bold">6-12</th>
-              <th className="px-6 py-4 text-center font-bold">13-16</th>
-              <th className="px-6 py-4 text-center font-bold">17+</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {data.map((row, idx) => (
-              <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4 font-medium text-slate-600">
-                  {row.dusun}
-                </td>
-                <td className="px-6 py-4 text-center text-slate-600">
-                  {row.u05}
-                </td>
-                <td className="px-6 py-4 text-center text-slate-600">
-                  {row.u612}
-                </td>
-                <td className="px-6 py-4 text-center text-slate-600">
-                  {row.u1316}
-                </td>
-                <td className="px-6 py-4 text-center text-slate-600">
-                  {row.u17plus}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        )}
+      </main>
     </div>
   );
 }

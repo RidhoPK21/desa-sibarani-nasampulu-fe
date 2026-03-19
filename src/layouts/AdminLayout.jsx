@@ -1,30 +1,38 @@
+import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import logoDesa from "../assets/logodesa.png";
 import me from "../assets/me.jpg";
 import {
   Home,
-  Users,
   PieChart,
   Ticket,
   FileText,
   Wallet,
   Star,
   PlusCircle,
-  User,
-  Settings,
   LogOut,
+  AlertTriangle,
 } from "lucide-react";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
 
-  // Fungsi untuk Logout
-  const handleLogout = () => {
+  // State untuk mengontrol kemunculan Modal Logout
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Fungsi untuk Logout (Dieksekusi setelah konfirmasi)
+  const handleConfirmLogout = () => {
+    // 1. Hapus token dari memori (Kunci pintu)
     localStorage.removeItem("token");
-    navigate("/login");
+
+    // 2. Tutup modal
+    setShowLogoutModal(false);
+
+    // 3. Lempar (Redirect) ke halaman Beranda Public
+    navigate("/");
   };
 
-  // Daftar Menu Utama
+  // Daftar Menu Utama (Profil Desa sudah dihapus)
   const mainMenus = [
     { name: "Dashboard", path: "/admin", icon: <Home size={20} /> },
     {
@@ -43,32 +51,32 @@ export default function AdminLayout() {
     { name: "IDM", path: "/admin/idm", icon: <PlusCircle size={20} /> },
   ];
 
- 
-
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       {/* ================= SIDEBAR KIRI ================= */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
+      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0 z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
         {/* AREA LOGO */}
         <div className="p-6 flex justify-center items-center border-b border-gray-100">
-          {/* Ganti src dengan path logo Toba Anda yang disimpan di folder public/ */}
-          <img src={logoDesa} alt="Logo Toba" className="h-24 object-contain" />
+          <img
+            src={logoDesa}
+            alt="Logo Desa"
+            className="h-24 object-contain transition-transform hover:scale-105"
+          />
         </div>
 
-        {/* AREA MENU (Bisa di-scroll jika layar kecil) */}
-        <div className="flex-1 overflow-y-auto py-4 scrollbar-hide">
-          <nav className="space-y-1 px-3">
+        {/* AREA MENU */}
+        <div className="flex-1 overflow-y-auto py-6 scrollbar-hide">
+          <nav className="space-y-1.5 px-4">
             {mainMenus.map((menu) => (
               <NavLink
                 key={menu.name}
                 to={menu.path}
-                // end properti ini penting agar rute induk ("/admin") tidak selalu hijau saat berada di sub-rute
                 end={menu.path === "/admin"}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors ${
+                  `flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
                     isActive
-                      ? "bg-[#4a9f6a] text-white" // Warna hijau jika aktif
-                      : "text-gray-500 hover:bg-gray-100 hover:text-gray-900" // Warna abu-abu jika tidak aktif
+                      ? "bg-[#4a9f6a] text-white shadow-md shadow-green-900/10"
+                      : "text-gray-500 hover:bg-gray-50 hover:text-[#4a9f6a]"
                   }`
                 }
               >
@@ -80,37 +88,78 @@ export default function AdminLayout() {
         </div>
 
         {/* AREA PROFIL USER (Paling Bawah) */}
-        <div className="border-t border-gray-200 p-4">
+        <div className="border-t border-gray-100 p-5 bg-gray-50/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
                 src={me} // Gambar avatar dummy
                 alt="Admin Profil"
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm"
               />
               <div>
-                <p className="text-sm font-semibold text-gray-800">
+                <p className="text-sm font-bold text-gray-800 line-clamp-1">
                   Admin Desa
                 </p>
-                <p className="text-xs text-gray-500">admin@sibarani.desa.id</p>
+                <p className="text-[11px] font-medium text-gray-500 line-clamp-1">
+                  admin@sibarani.desa.id
+                </p>
               </div>
             </div>
+
+            {/* Tombol yang memicu kemunculan Modal */}
             <button
-              onClick={handleLogout}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Logout"
+              onClick={() => setShowLogoutModal(true)}
+              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors group"
+              title="Keluar dari Panel Admin"
             >
-              <LogOut size={20} />
+              <LogOut
+                size={20}
+                className="group-hover:-translate-x-0.5 transition-transform"
+              />
             </button>
           </div>
         </div>
       </aside>
 
       {/* ================= KONTEN UTAMA KANAN ================= */}
-      {/* Di sinilah kode teman-teman Anda akan muncul otomatis */}
-      <main className="flex-1 overflow-y-auto bg-gray-50 p-8">
+      <main className="flex-1 overflow-y-auto bg-gray-50/50 relative">
         <Outlet />
       </main>
+
+      {/* ================= MODAL KONFIRMASI LOGOUT ================= */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Yakin Ingin Keluar?
+              </h3>
+              <p className="text-gray-500 text-sm mb-6">
+                Anda akan mengakhiri sesi admin ini dan kembali ke halaman utama
+                publik.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleConfirmLogout}
+                  className="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-colors shadow-sm shadow-red-500/30"
+                >
+                  Ya, Keluar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
