@@ -33,7 +33,7 @@ export default function Navbar() {
         </Link>
         
         {/* Menu Navigasi Desktop */}
-        <ul className="hidden lg:flex space-x-5 text-sm">
+        <ul className="hidden lg:flex space-x-5 text-sm items-center">
           <li><Link to="/" style={getStyle("/")} className="whitespace-nowrap transition-colors hover:text-white">Beranda</Link></li>
           <li><Link to="/profil" style={getStyle("/profil")} className="whitespace-nowrap transition-colors hover:text-white">Profil</Link></li>
           <li><Link to="/infografis" style={getStyle("/infografis")} className="whitespace-nowrap transition-colors hover:text-white">Infografis</Link></li>
@@ -42,6 +42,8 @@ export default function Navbar() {
           <li><Link to="/dokumentasi" style={getStyle("/dokumentasi")} className="whitespace-nowrap transition-colors hover:text-white">Dokumentasi</Link></li>
           <li><Link to="/berita" style={getStyle("/berita")} className="whitespace-nowrap transition-colors hover:text-white">Berita</Link></li>
           <li><Link to="/apb-desa" style={getStyle("/apb-desa")} className="whitespace-nowrap transition-colors hover:text-white">APB Desa</Link></li>
+          <li><Link to="/galeri" style={getStyle("/galeri")} className="whitespace-nowrap transition-colors hover:text-white">Galeri</Link></li>
+          <li><Link to="/login" className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 whitespace-nowrap">Login</Link></li>
         </ul>
 
         {/* Tombol Hamburger untuk Mobile */}
@@ -78,6 +80,8 @@ export default function Navbar() {
           <Link to="/dokumentasi" style={getMobileStyle("/dokumentasi")} onClick={closeMenu} className="block px-3 py-2 rounded-md text-base">Dokumentasi</Link>
           <Link to="/berita" style={getMobileStyle("/berita")} onClick={closeMenu} className="block px-3 py-2 rounded-md text-base">Berita</Link>
           <Link to="/apb-desa" style={getMobileStyle("/apb-desa")} onClick={closeMenu} className="block px-3 py-2 rounded-md text-base">APB Desa</Link>
+          <Link to="/galeri" style={getMobileStyle("/galeri")} onClick={closeMenu} className="block px-3 py-2 rounded-md text-base">Galeri</Link>
+          <Link to="/login" onClick={closeMenu} className="block px-3 py-2 rounded-md text-base bg-gray-900 hover:bg-gray-800 text-white font-bold mt-2 shadow-md transition-colors">Login</Link>
         </div>
       )}
     </nav>

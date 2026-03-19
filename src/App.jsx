@@ -10,6 +10,8 @@ import ProfilDesa from "./pages/public/ProfilDesa";
 import Pemerintahan from "./pages/public/Pemerintahan";
 import InformasiPublik from "./pages/public/InformasiPublik";
 import Kegiatan from "./pages/public/Kegiatan";
+import Galeri from "./pages/public/Galeri";
+import Login from "./pages/public/Login";
 
 // Pages: Admin (Dashboard & Fitur)
 import Dashboard from "./pages/admin/Dashboard";
@@ -34,7 +36,11 @@ export default function App() {
           <Route path="pemerintahan" element={<Pemerintahan />} />
           <Route path="informasi-publik" element={<InformasiPublik />} />
           <Route path="kegiatan" element={<Kegiatan />} />
+          <Route path="galeri" element={<Galeri />} />
         </Route>
+
+        {/* LOGIN Route */}
+        <Route path="/login" element={<Login />} />
 
         {/* ======================================= */}
         {/* Rute untuk Admin (Area Privat)          */}
