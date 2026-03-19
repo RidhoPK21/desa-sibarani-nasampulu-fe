@@ -12,6 +12,7 @@ import InformasiPublik from "./pages/public/InformasiPublik";
 import Kegiatan from "./pages/public/Kegiatan";
 
 // Pages: Admin (Dashboard & Fitur)
+import Login from "./pages/admin/Login";
 import Dashboard from "./pages/admin/Dashboard";
 import Infografis from "./pages/admin/Infografis"; 
 import KegiatanDesa from "./pages/admin/KegiatanDesa"; 
@@ -27,7 +28,6 @@ export default function App() {
         {/* ======================================= */}
         {/* Rute untuk Warga (Area Publik)          */}
         {/* ======================================= */}
-        {/* Menggunakan PublicLayout dari kode Anda */}
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<Home />} />
           <Route path="profil-desa" element={<ProfilDesa />} />
@@ -37,9 +37,13 @@ export default function App() {
         </Route>
 
         {/* ======================================= */}
+        {/* Rute Login Admin (tanpa sidebar)        */}
+        {/* ======================================= */}
+        <Route path="/admin/login" element={<Login />} />
+
+        {/* ======================================= */}
         {/* Rute untuk Admin (Area Privat)          */}
         {/* ======================================= */}
-        {/* Menggunakan AdminLayout dari kode teman Anda */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="infografis" element={<Infografis />} />
