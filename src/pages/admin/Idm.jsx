@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+
 // Data simulasi untuk grafik sesuai gambar
 const data = [
   { name: "Jan", value: 25 },

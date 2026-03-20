@@ -163,6 +163,7 @@ export default function Infografis() {
               <th className="px-6 py-4 text-center font-bold">13-16</th>
               <th className="px-6 py-4 text-center font-bold">17+</th>
             </tr>
+            
           </thead>
           <tbody className="divide-y divide-slate-100">
             {data.map((row, idx) => (
