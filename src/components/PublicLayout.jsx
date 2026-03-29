@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
+import PublicFooter from "./PublicFooter";
 
 export default function PublicLayout() {
   const location = useLocation();
@@ -17,6 +18,7 @@ export default function PublicLayout() {
       <main className="flex-grow pt-20">
         <Outlet />
       </main>
+      <PublicFooter />
     </div>
   );
 }

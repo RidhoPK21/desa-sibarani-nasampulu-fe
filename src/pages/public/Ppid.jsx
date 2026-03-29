@@ -437,7 +437,7 @@ export default function Ppid() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#4EA674" }}>
+    <div style={{ backgroundColor: "#4EA674" }}>
       <div className="max-w-4xl mx-auto px-4 py-10">
         {/* Header */}
         <div className="text-center mb-10">
@@ -496,50 +496,6 @@ export default function Ppid() {
           />
         )}
       </div>
-
-      {/* Footer */}
-      <footer className="mt-10 bg-white/10 backdrop-blur-sm border-t border-white/20">
-        <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col md:flex-row items-start gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center overflow-hidden">
-              <span className="text-white text-xs font-bold text-center leading-tight">
-                TOBA
-              </span>
-            </div>
-            <div>
-              <p className="text-white font-semibold text-sm">
-                Pemerintah Desa Sibarani Nasampulu
-              </p>
-              <p className="text-white/70 text-xs mt-1">Jl.</p>
-              <p className="text-white/70 text-xs">
-                Desa Sibarani Nasampulu, Kecamatan Laguboti, Kabupaten Toba
-              </p>
-              <p className="text-white/70 text-xs">
-                Provinsi Sumatra Utara, 22381
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-white/10 px-4 py-4 max-w-4xl mx-auto flex justify-between items-center">
-          <p className="text-white/50 text-xs">
-            © 2026 Welcome. All right reserved.
-          </p>
-          <div className="flex gap-3">
-            {["YT", "TW", "IN"].map((s) => (
-              <a
-                key={s}
-                href="#"
-                className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white text-xs transition-colors"
-              >
-                {s[0]}
-              </a>
-            ))}
-          </div>
-          <a href="#" className="text-white/60 text-xs hover:text-white">
-            Hubungi Kami
-          </a>
-        </div>
-      </footer>
     </div>
   );
 }
