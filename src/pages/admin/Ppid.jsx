@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
   Search,
-  Bell,
   Trash2,
   FileText,
   PlusCircle,
@@ -10,26 +9,69 @@ import {
   Download,
 } from "lucide-react";
 
-// Pastikan endpoint ini sesuai dengan route api.php Anda (misal: /info/dokumen atau /info/ppid)
 const API_URL = `${import.meta.env.VITE_API_URL}/info/dokumen`;
+const DEFAULT_PPID_CATEGORIES = ["Regulasi"];
 
-export default function PpidDesa() {
+const getDefaultJenisPpid = (categories = DEFAULT_PPID_CATEGORIES) =>
+  categories[0] || "";
+
+const extractErrorMessage = (
+  error,
+  fallbackMessage = "Terjadi kesalahan saat menyimpan dokumen!",
+) => {
+  const responseMessage = error.response?.data?.message;
+
+  if (typeof responseMessage === "string" && responseMessage.trim()) {
+    return responseMessage;
+  }
+
+  const validationErrors = error.response?.data?.errors;
+  if (validationErrors && typeof validationErrors === "object") {
+    const firstError = Object.values(validationErrors)
+      .flat()
+      .find(Boolean);
+
+    if (typeof firstError === "string" && firstError.trim()) {
+      return firstError;
+    }
+  }
+
+  if (error.response?.status === 504) {
+    return "Kategori PPID yang dipilih belum sesuai dengan format backend.";
+  }
+
+  return fallbackMessage;
+};
+
+export default function Ppid() {
   const [view, setView] = useState("list");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
   const [dokumen, setDokumen] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [notification, setNotification] = useState(null);
 
-  // STATE DISESUAIKAN DENGAN NAMA KOLOM DOKUMEN (PPID)
   const [formData, setFormData] = useState({
     nama_ppid: "",
-    jenis_ppid: "Regulasi",
+    jenis_ppid: getDefaultJenisPpid(),
     deskripsi_ppid: "",
     file: null,
   });
-  // State untuk menampilkan nama file yang dipilih
   const [fileName, setFileName] = useState("");
+
+  const kategoriOptions = useMemo(() => {
+    const options = new Set(DEFAULT_PPID_CATEGORIES);
+
+    dokumen.forEach((item) => {
+      if (item?.jenis_ppid) {
+        options.add(item.jenis_ppid);
+      }
+    });
+
+    return Array.from(options);
+  }, [dokumen]);
 
   const token = localStorage.getItem("token");
   const axiosConfig = {
@@ -41,7 +83,7 @@ export default function PpidDesa() {
     try {
       setLoading(true);
       const response = await axios.get(API_URL, axiosConfig);
-      setDokumen(response.data.data);
+      setDokumen(Array.isArray(response.data?.data) ? response.data.data : []);
     } catch (error) {
       console.error("Gagal mengambil data dokumen:", error);
     } finally {
@@ -51,8 +93,19 @@ export default function PpidDesa() {
 
   useEffect(() => {
     fetchDokumen();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!notification) {
+      return undefined;
+    }
+
+    const timer = setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [notification]);
 
   // 2. HANDLE INPUT
   const handleInputChange = (e) => {
@@ -63,8 +116,8 @@ export default function PpidDesa() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, file: file }));
-      setFileName(file.name); // Tampilkan nama file di UI
+      setFormData((prev) => ({ ...prev, file }));
+      setFileName(file.name);
     }
   };
 
@@ -73,7 +126,7 @@ export default function PpidDesa() {
     setSelectedItem(null);
     setFormData({
       nama_ppid: "",
-      jenis_ppid: "Regulasi",
+      jenis_ppid: getDefaultJenisPpid(kategoriOptions),
       deskripsi_ppid: "",
       file: null,
     });
@@ -99,13 +152,29 @@ export default function PpidDesa() {
 
   // 5. SIMPAN DATA (CREATE / UPDATE)
   const handleSave = async () => {
+    if (!formData.nama_ppid.trim()) {
+      alert("Nama atau judul dokumen wajib diisi.");
+      return;
+    }
+
+    if (!formData.jenis_ppid) {
+      alert("Jenis PPID wajib dipilih.");
+      return;
+    }
+
+    if (!selectedItem && !formData.file) {
+      alert("File dokumen wajib dipilih saat menambah data baru.");
+      return;
+    }
+
     try {
+      setSaving(true);
       const data = new FormData();
-      data.append("nama_ppid", formData.nama_ppid);
+      data.append("nama_ppid", formData.nama_ppid.trim());
       data.append("jenis_ppid", formData.jenis_ppid);
 
       if (formData.deskripsi_ppid) {
-        data.append("deskripsi_ppid", formData.deskripsi_ppid);
+        data.append("deskripsi_ppid", formData.deskripsi_ppid.trim());
       }
 
       if (formData.file) {
@@ -119,14 +188,14 @@ export default function PpidDesa() {
         await axios.post(API_URL, data, axiosConfig);
       }
 
-      fetchDokumen();
+      await fetchDokumen();
       setView("list");
+      setSelectedItem(null);
     } catch (error) {
       console.error("Gagal menyimpan data:", error);
-      alert(
-        error.response?.data?.message ||
-          "Terjadi kesalahan saat menyimpan dokumen!",
-      );
+      alert(extractErrorMessage(error));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -137,17 +206,61 @@ export default function PpidDesa() {
   };
 
   const handleDelete = async () => {
-    try {
-      await axios.delete(`${API_URL}/${selectedItem.id}`, axiosConfig);
-      fetchDokumen();
+    if (!selectedItem?.id) {
       setShowDeleteModal(false);
+      setNotification({
+        type: "error",
+        message: "Dokumen yang akan dihapus tidak ditemukan.",
+      });
+      return;
+    }
+
+    const itemToDelete = selectedItem;
+    const previousDokumen = dokumen;
+
+    setShowDeleteModal(false);
+    setSelectedItem(null);
+    setDokumen((prev) => prev.filter((item) => item.id !== itemToDelete.id));
+    setNotification({
+      type: "success",
+      message: `Dokumen PPID "${itemToDelete.nama_ppid}" berhasil dihapus.`,
+    });
+
+    try {
+      const data = new FormData();
+      data.append("_method", "DELETE");
+
+      await axios.post(`${API_URL}/${itemToDelete.id}`, data, axiosConfig);
+      fetchDokumen();
     } catch (error) {
       console.error("Gagal menghapus data:", error);
+      setDokumen(previousDokumen);
+      setNotification({
+        type: "error",
+        message: extractErrorMessage(
+          error,
+          "Terjadi kesalahan saat menghapus dokumen!",
+        ),
+      });
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-slate-700">
+      {notification && (
+        <div className="fixed top-6 right-6 z-[60] max-w-sm">
+          <div
+            className={`rounded-2xl border px-4 py-3 shadow-xl ${
+              notification.type === "error"
+                ? "border-red-200 bg-red-50 text-red-700"
+                : "border-emerald-200 bg-emerald-50 text-emerald-700"
+            }`}
+          >
+            <p className="text-sm font-semibold">{notification.message}</p>
+          </div>
+        </div>
+      )}
+
       <main className="flex flex-col p-8">
         {/* HEADER */}
         <div className="flex justify-between items-center mb-8">
@@ -161,7 +274,6 @@ export default function PpidDesa() {
               />
               <Search className="absolute right-3 top-2.5 text-gray-400 w-5 h-5" />
             </div>
-            
           </div>
         </div>
 
@@ -267,10 +379,13 @@ export default function PpidDesa() {
             <div className="flex justify-end mb-4">
               <button
                 onClick={handleSave}
-                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-lg shadow-md transition"
+                disabled={saving}
+                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg shadow-md transition"
               >
-                <PlusCircle className="w-5 h-5" /> Simpan{" "}
-                {selectedItem ? "Perubahan" : ""}
+                <PlusCircle className="w-5 h-5" />
+                {saving
+                  ? "Menyimpan..."
+                  : `Simpan ${selectedItem ? "Perubahan" : ""}`.trim()}
               </button>
             </div>
 
@@ -332,11 +447,11 @@ export default function PpidDesa() {
                     onChange={handleInputChange}
                     className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 ring-emerald-100"
                   >
-                    {/* Value harus sama persis dengan Enum di Database */}
-                    <option value="Regulasi">Regulasi</option>
-                    <option value="Laporan Keuangan">Laporan Keuangan</option>
-                    <option value="SK Kades">SK Kades</option>
-                    <option value="Lainnya">Lainnya</option>
+                    {kategoriOptions.map((kategori) => (
+                      <option key={kategori} value={kategori}>
+                        {kategori}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
