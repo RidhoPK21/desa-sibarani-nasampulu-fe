@@ -1,80 +1,77 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import axios from "axios";
 import {
   PieChart,
   Pie,
   Cell,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 
-// ── DATA STATISTIK ────────────────────────────────────────────────
-const statistikData = [
+// ── CONFIG ────────────────────────────────────────────────────────
+const API_URL = `${import.meta.env.VITE_API_URL}/statistic/dusun`;
+
+const initialStatistikData = [
   {
     id: "usia",
     judul: "Statistik Usia",
-    subjudul:
-      "Keterangan jumlah balita, anak - anak, remaja, dewasa dan lansia",
-    deskripsi:
-      "We invest in building long-term, sustainable relationships and support our projects in their growth journey with our services, industry expertise and network.",
+    subjudul: "Keterangan jumlah balita, anak - anak, remaja, dewasa dan lansia",
+    deskripsi: "Kami berkomitmen untuk memantau pertumbuhan penduduk secara berkala guna merencanakan program pelayanan kesehatan dan sosial yang tepat sasaran bagi seluruh kelompok usia.",
     data: [
-      { name: "Balita", value: 135, color: "#6366f1" },
-      { name: "Anak-anak", value: 261, color: "#ec4899" },
-      { name: "Remaja", value: 220, color: "#a78bfa" },
-      { name: "Dewasa", value: 905, color: "#34d399" },
-      { name: "Lansia", value: 351, color: "#fbbf24" },
+      { name: "Balita", value: 0, color: "#6366f1" },
+      { name: "Anak-anak", value: 0, color: "#ec4899" },
+      { name: "Remaja", value: 0, color: "#a78bfa" },
+      { name: "Dewasa", value: 0, color: "#34d399" },
+      { name: "Lansia", value: 0, color: "#fbbf24" },
     ],
-    total: "1.872",
+    total: "0",
     satuan: "Jiwa",
     posisiChart: "kanan",
   },
   {
     id: "pendidikan",
     judul: "Statistik Pendidikan",
-    subjudul:
-      "Keterangan jumlah yang bersekolah SD, SMP, SMA, Sarjana, dan non Sarjana",
-    deskripsi:
-      "We invest in building long-term, sustainable relationships and support our projects in their growth journey with our services, industry expertise and network.",
+    subjudul: "Keterangan jumlah yang bersekolah SD, SMP, SMA, Sarjana, dan non Sarjana",
+    deskripsi: "Pendidikan adalah pilar utama pembangunan desa. Kami menyajikan data tingkat pendidikan penduduk sebagai acuan untuk mendukung program peningkatan SDM di Desa Sibarani Nasampulu.",
     data: [
-      { name: "SD", value: 412, color: "#6366f1" },
-      { name: "SMP", value: 318, color: "#ec4899" },
-      { name: "SMA", value: 541, color: "#a78bfa" },
+      { name: "SD", value: 0, color: "#6366f1" },
+      { name: "SMP", value: 0, color: "#ec4899" },
+      { name: "SMA", value: 0, color: "#a78bfa" },
+      { name: "Sarjana", value: 0, color: "#34d399" },
+      { name: "Lainnya", value: 0, color: "#fbbf24" },
     ],
-    total: "1.271",
+    total: "0",
     satuan: "Siswa",
     posisiChart: "kiri",
   },
   {
     id: "pekerjaan",
     judul: "Statistik Pekerjaan",
-    subjudul:
-      "Keterangan jumlah orang yang bekerja sebagai petani, nelayan, asn, wiraswasta",
-    deskripsi:
-      "We invest in building long-term, sustainable relationships and support our projects in their growth journey with our services, industry expertise and network.",
+    subjudul: "Keterangan jumlah orang yang bekerja sebagai petani, nelayan, asn, wiraswasta",
+    deskripsi: "Gambaran mata pencaharian penduduk mencerminkan potensi ekonomi desa. Data ini membantu pemerintah desa dalam merancang pemberdayaan ekonomi masyarakat.",
     data: [
-      { name: "Petani", value: 380, color: "#6366f1" },
-      { name: "Nelayan", value: 95, color: "#ec4899" },
-      { name: "ASN", value: 142, color: "#a78bfa" },
-      { name: "Wiraswasta", value: 263, color: "#34d399" },
+      { name: "Petani", value: 0, color: "#6366f1" },
+      { name: "Nelayan", value: 0, color: "#ec4899" },
+      { name: "ASN", value: 0, color: "#a78bfa" },
+      { name: "Wiraswasta", value: 0, color: "#34d399" },
+      { name: "Lainnya", value: 0, color: "#fbbf24" },
     ],
-    total: "880",
+    total: "0",
     satuan: "Orang",
     posisiChart: "kanan",
   },
   {
     id: "agama",
     judul: "Statistik Agama",
-    subjudul:
-      "Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu",
-    deskripsi:
-      "We invest in building long-term, sustainable relationships and support our projects in their growth journey with our services, industry expertise and network.",
+    subjudul: "Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu",
+    deskripsi: "Keberagaman agama di desa kami adalah kekuatan sosial yang harmonis. Kami senantiasa menjaga toleransi dan kerukunan antarumat beragama.",
     data: [
-      { name: "Kristen", value: 1420, color: "#6366f1" },
-      { name: "Muslim", value: 320, color: "#ec4899" },
-      { name: "Katolik", value: 132, color: "#a78bfa" },
+      { name: "Kristen", value: 0, color: "#6366f1" },
+      { name: "Muslim", value: 0, color: "#ec4899" },
+      { name: "Katolik", value: 0, color: "#a78bfa" },
+      { name: "Lainnya", value: 0, color: "#34d399" },
     ],
-    total: "1.872",
+    total: "0",
     satuan: "Jiwa",
     posisiChart: "kiri",
   },
@@ -82,69 +79,42 @@ const statistikData = [
     id: "perkawinan",
     judul: "Statistik Status Perkawinan",
     subjudul: "Keterangan jumlah orang yang kawin dan belum kawin",
-    deskripsi:
-      "We invest in building long-term, sustainable relationships and support our projects in their growth journey with our services, industry expertise and network.",
+    deskripsi: "Data status perkawinan membantu dalam pendataan kependudukan dan perencanaan program kesejahteraan keluarga di tingkat dusun.",
     data: [
-      { name: "Sudah Kawin", value: 842, color: "#6366f1" },
-      { name: "Belum Kawin", value: 1030, color: "#ec4899" },
+      { name: "Sudah Kawin", value: 0, color: "#6366f1" },
+      { name: "Belum Kawin", value: 0, color: "#ec4899" },
+      { name: "Cerai", value: 0, color: "#a78bfa" },
     ],
-    total: "1.872",
+    total: "0",
     satuan: "Jiwa",
     posisiChart: "kanan",
   },
   {
     id: "penduduk",
     judul: "Statistik Penduduk",
-    subjudul:
-      "Keterangan jumlah yang bersekolah SD, SMP, SMA, Sarjana, dan non Sarjana",
-    deskripsi:
-      "We invest in building long-term, sustainable relationships and support our projects in their growth journey with our services, industry expertise and network.",
+    subjudul: "Keterangan jumlah penduduk berdasarkan jenis kelamin",
+    deskripsi: "Data real-time penduduk laki-laki dan perempuan untuk memastikan keseimbangan demografi dan ketepatan distribusi bantuan sosial.",
     data: [
-      { name: "Laki-laki", value: 936, color: "#6366f1" },
-      { name: "Perempuan", value: 936, color: "#ec4899" },
+      { name: "Laki-laki", value: 0, color: "#6366f1" },
+      { name: "Perempuan", value: 0, color: "#ec4899" },
     ],
-    total: "1.872",
+    total: "0",
     satuan: "Jiwa",
     posisiChart: "kiri",
   },
 ];
 
-// ── THEME HELPER ─────────────────────────────────────────────────
-// index 0=usia,1=pendidikan,2=pekerjaan → dark/green bg
-// index 3=agama → white bg
-// index 4=perkawinan → light green bg
-// index 5=penduduk → medium green bg
-const getSectionTheme = (index) => {
-  if (index === 3) return "white";
-  if (index === 4) return "lightgreen";
-  if (index === 5) return "midgreen";
-  return "dark";
-};
-
-// ── DONUT CHART MINI ─────────────────────────────────────────────
-const DonutChartCard = ({ item, theme = "dark" }) => {
+// ── DONUT CHART CARD ─────────────────────────────────────────────
+const DonutChartCard = ({ item, theme = "dark", dusunList, selectedDusun, setSelectedDusun }) => {
   const totalValue = item.data.reduce((sum, d) => sum + d.value, 0);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div
-          style={{
-            background: "rgba(255,255,255,0.95)",
-            border: "1px solid #e2e8f0",
-            borderRadius: 8,
-            padding: "8px 12px",
-            fontSize: 12,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          }}
-        >
+        <div style={{ background: "rgba(255,255,255,0.95)", border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 12px", fontSize: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
           <p style={{ fontWeight: 700, color: "#1e293b" }}>{payload[0].name}</p>
-          <p style={{ color: payload[0].payload.color }}>
-            {payload[0].value.toLocaleString("id-ID")} jiwa
-          </p>
-          <p style={{ color: "#64748b" }}>
-            {((payload[0].value / totalValue) * 100).toFixed(1)}%
-          </p>
+          <p style={{ color: payload[0].payload.color }}>{payload[0].value.toLocaleString("id-ID")} {item.satuan}</p>
+          <p style={{ color: "#64748b" }}>{totalValue > 0 ? ((payload[0].value / totalValue) * 100).toFixed(1) : 0}%</p>
         </div>
       );
     }
@@ -152,125 +122,58 @@ const DonutChartCard = ({ item, theme = "dark" }) => {
   };
 
   const isLight = theme === "white";
-  const isLightGreen = theme === "lightgreen";
-  const cardBg = isLight
-    ? "#ffffff"
-    : isLightGreen
-      ? "#ffffff"
-      : "rgba(255,255,255,0.12)";
-  const cardBorder = isLight
-    ? "1px solid #e2e8f0"
-    : isLightGreen
-      ? "1px solid #d1e8d8"
-      : "1px solid rgba(255,255,255,0.25)";
-  const cardShadow =
-    isLight || isLightGreen
-      ? "0 4px 24px rgba(0,0,0,0.08)"
-      : "0 8px 32px rgba(0,0,0,0.12)";
-  const labelColor =
-    isLight || isLightGreen ? "#94a3b8" : "rgba(255,255,255,0.7)";
-  const totalColor = isLight || isLightGreen ? "#3b82f6" : "#fff";
-  const subColor =
-    isLight || isLightGreen ? "#64748b" : "rgba(255,255,255,0.65)";
-  const legendColor =
-    isLight || isLightGreen ? "#374151" : "rgba(255,255,255,0.85)";
+  const cardBg = isLight ? "#ffffff" : "rgba(255,255,255,0.12)";
+  const labelColor = isLight ? "#64748b" : "rgba(255,255,255,0.7)";
+  const totalColor = isLight ? "#4EA674" : "#fff";
 
   return (
-    <div
-      style={{
-        background: cardBg,
-        backdropFilter: isLight || isLightGreen ? "none" : "blur(16px)",
-        borderRadius: 16,
-        padding: "24px 28px",
-        border: cardBorder,
-        boxShadow: cardShadow,
-        minWidth: 280,
-        maxWidth: 340,
-        width: "100%",
-      }}
-    >
-      {/* Card Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 4,
-        }}
-      >
-        <span
+    <div style={{ background: cardBg, backdropFilter: isLight ? "none" : "blur(16px)", borderRadius: 16, padding: "24px 28px", border: isLight ? "1px solid #e2e8f0" : "1px solid rgba(255,255,255,0.25)", boxShadow: "0 8px 32px rgba(0,0,0,0.1)", minWidth: 280, maxWidth: 340, width: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: labelColor, letterSpacing: 1 }}>CHART TITLE</span>
+
+        <select
+          value={selectedDusun}
+          onChange={(e) => setSelectedDusun(e.target.value)}
           style={{
             fontSize: 11,
-            fontWeight: 600,
+            background: "transparent",
+            border: "none",
             color: labelColor,
-            letterSpacing: 1,
-            textTransform: "uppercase",
+            cursor: "pointer",
+            outline: "none",
+            fontWeight: 600
           }}
         >
-          CHART TITLE
-        </span>
-        <span style={{ fontSize: 11, color: labelColor }}>This Week ▾</span>
-      </div>
-      <div style={{ marginBottom: 2 }}>
-        <span style={{ fontSize: 26, fontWeight: 800, color: totalColor }}>
-          {item.total}
-        </span>
-      </div>
-      <div style={{ fontSize: 11, color: subColor, marginBottom: 12 }}>
-        {item.data.reduce((s, d) => s + d.value, 0).toLocaleString("id-ID")}{" "}
-        {item.satuan === "Jiwa" ? "Orders" : item.satuan}
+          <option value="all" style={{color: "#000"}}>Semua Dusun ▾</option>
+          {dusunList.map(d => (
+            <option key={d.id} value={d.id} style={{color: "#000"}}>{d.nama_dusun}</option>
+          ))}
+        </select>
       </div>
 
-      {/* Chart + Legend Row */}
+      <div style={{ marginBottom: 2 }}>
+        <span style={{ fontSize: 26, fontWeight: 800, color: totalColor }}>{item.total}</span>
+      </div>
+      <div style={{ fontSize: 11, color: labelColor, marginBottom: 12 }}>
+        {totalValue.toLocaleString("id-ID")} {item.satuan}
+      </div>
+
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <div style={{ width: 120, height: 120, flexShrink: 0 }}>
+        <div style={{ width: 120, height: 120 }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie
-                data={item.data}
-                cx="50%"
-                cy="50%"
-                innerRadius={35}
-                outerRadius={56}
-                paddingAngle={2}
-                dataKey="value"
-                strokeWidth={0}
-              >
-                {item.data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
+              <Pie data={item.data} cx="50%" cy="50%" innerRadius={35} outerRadius={56} paddingAngle={2} dataKey="value" strokeWidth={0}>
+                {item.data.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
         </div>
-
-        {/* Legend */}
         <div style={{ flex: 1 }}>
-          {item.data.slice(0, 4).map((d, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                marginBottom: 5,
-              }}
-            >
-              <div
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  background: d.color,
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{ fontSize: 10, color: legendColor, fontWeight: 500 }}
-              >
-                {d.name}
-              </span>
+          {item.data.map((d, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: d.color }} />
+              <span style={{ fontSize: 10, color: isLight ? "#334155" : "rgba(255,255,255,0.8)", fontWeight: 500 }}>{d.name}</span>
             </div>
           ))}
         </div>
@@ -279,458 +182,174 @@ const DonutChartCard = ({ item, theme = "dark" }) => {
   );
 };
 
-// ── ANIMATED SECTION ──────────────────────────────────────────────
-const StatSection = ({ item, index }) => {
+const StatSection = ({ item, index, dusunList, selectedDusun, setSelectedDusun, isCombined }) => {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
-  const theme = getSectionTheme(index);
-
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setVisible(true);
-      },
-      { threshold: 0.15 },
-    );
+    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setVisible(true); }, { threshold: 0.1 });
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
-  const isLeft = item.posisiChart === "kiri";
+  const isWhite = index === 1 || index === 3;
 
-  // Section background transparent — let main gradient show
-  const sectionBg = "transparent";
+  // Jika isCombined true, background diatur oleh wrapper luar
+  const sectionBg = isCombined
+    ? "transparent"
+    : isWhite
+      ? "#ffffff"
+      : "linear-gradient(135deg, #57A677 0%, #4EA674 100%)";
 
-  const titleColor =
-    theme === "white" ? "#1e293b" : theme === "lightgreen" ? "#1e293b" : "#fff";
-
-  const subjudulColor =
-    theme === "white"
-      ? "#1e293b"
-      : theme === "lightgreen"
-        ? "#1e293b"
-        : "rgba(255,255,255,0.95)";
-
-  const deskripsiColor =
-    theme === "white"
-      ? "#475569"
-      : theme === "lightgreen"
-        ? "#374151"
-        : "rgba(255,255,255,0.75)";
+  const textColor = isWhite ? "#334155" : "#ffffff";
+  const theme = isWhite ? "white" : "dark";
 
   return (
-    <section
-      ref={ref}
-      style={{
-        padding: "64px 0",
-        background: sectionBg,
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(32px)",
-        transition: "opacity 0.7s ease, transform 0.7s ease",
-        transitionDelay: `${index * 0.05}s`,
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1000,
-          margin: "0 auto",
-          padding: "0 32px",
-          display: "flex",
-          alignItems: "center",
-          gap: 64,
-          flexDirection: isLeft ? "row" : "row-reverse",
-        }}
-      >
-        {/* TEKS SIDE */}
-        <div style={{ flex: 1 }}>
-          <h2
-            style={{
-              fontSize: 26,
-              fontWeight: 800,
-              color: titleColor,
-              marginBottom: 16,
-              lineHeight: 1.2,
-              fontFamily: "'Georgia', serif",
-            }}
-          >
-            {item.judul}
-          </h2>
-          <p
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: subjudulColor,
-              marginBottom: 12,
-              lineHeight: 1.6,
-            }}
-          >
-            {item.subjudul}
-          </p>
-          <p
-            style={{
-              fontSize: 13,
-              color: deskripsiColor,
-              lineHeight: 1.8,
-            }}
-          >
-            {item.deskripsi}
-          </p>
-        </div>
+    <section ref={ref} style={{
+      padding: isCombined && index === 0 ? "0px 0 90px" : "90px 0",
+      background: sectionBg,
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(32px)",
+      transition: "all 0.8s ease",
+      position: "relative",
+      overflow: "hidden"
+    }}>
+      {/* --- EFEK BLOBS (Hanya jika tidak digabung atau di bagian hijau) --- */}
+      {!isWhite && !isCombined && (
+        <>
+          <div style={{ position: "absolute", top: "-10%", left: "-5%", width: "400px", height: "400px", background: "rgba(59, 130, 246, 0.25)", borderRadius: "50%", filter: "blur(100px)", pointerEvents: "none" }}></div>
+          <div style={{ position: "absolute", bottom: "-10%", right: "-5%", width: "450px", height: "450px", background: "rgba(29, 78, 216, 0.2)", borderRadius: "50%", filter: "blur(120px)", pointerEvents: "none" }}></div>
+        </>
+      )}
 
-        {/* CHART SIDE */}
-        <div
-          style={{
-            flexShrink: 0,
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <DonutChartCard item={item} theme={theme} />
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", gap: 64, flexDirection: item.posisiChart === "kiri" ? "row" : "row-reverse", position: "relative", zIndex: 10 }}>
+        <div style={{ flex: 1 }}>
+          <h2 style={{ fontSize: 34, fontWeight: 900, color: textColor, marginBottom: 16, fontFamily: "'Georgia', serif", fontStyle: "italic", textShadow: isWhite ? "none" : "0 2px 4px rgba(0,0,0,0.15)" }}>{item.judul}</h2>
+          <p style={{ fontSize: 16, fontWeight: 700, color: textColor, marginBottom: 12, opacity: 0.95 }}>{item.subjudul}</p>
+          <p style={{ fontSize: 14, color: textColor, opacity: 0.85, lineHeight: 1.8 }}>{item.deskripsi}</p>
         </div>
+        <DonutChartCard item={item} theme={theme} dusunList={dusunList} selectedDusun={selectedDusun} setSelectedDusun={setSelectedDusun} />
       </div>
     </section>
   );
 };
 
-// ── DIVIDER ───────────────────────────────────────────────────────
-const Divider = ({ index }) => {
-  // index 2→3 (pekerjaan→agama): transition to white zone
-  // index 3→4 (agama→perkawinan): back to green
-  const isNearWhite = index === 2 || index === 3;
-  return (
-    <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 32px" }}>
-      <div
-        style={{
-          height: 1,
-          background: isNearWhite
-            ? "linear-gradient(to right, transparent, rgba(100,100,100,0.15), transparent)"
-            : "linear-gradient(to right, transparent, rgba(255,255,255,0.25), transparent)",
-        }}
-      />
-    </div>
-  );
-};
-
-// ── MAIN COMPONENT ────────────────────────────────────────────────
 export default function InfografisPublik() {
+  const [rawData, setRawData] = useState([]);
+  const [selectedDusun, setSelectedDusun] = useState("all");
+  const [displayData, setDisplayData] = useState(initialStatistikData);
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const res = await axios.get(API_URL);
+        if (res.data.status === "success") setRawData(res.data.data);
+      } catch (err) { console.error(err); }
+    };
+    fetchAll();
+  }, []);
+
+  useEffect(() => {
+    const newStat = JSON.parse(JSON.stringify(initialStatistikData));
+    const filtered = selectedDusun === "all" ? rawData : rawData.filter(d => d.id === selectedDusun);
+
+    filtered.forEach(dusun => {
+      newStat[5].data[0].value += dusun.penduduk_laki || 0;
+      newStat[5].data[1].value += dusun.penduduk_perempuan || 0;
+      dusun.usias?.forEach(u => {
+        if (u.kelompok_usia.includes("Balita")) newStat[0].data[0].value += u.jumlah_jiwa;
+        else if (u.kelompok_usia.includes("Anak")) newStat[0].data[1].value += u.jumlah_jiwa;
+        else if (u.kelompok_usia.includes("Pemuda")) newStat[0].data[2].value += u.jumlah_jiwa;
+        else if (u.kelompok_usia.includes("Dewasa")) newStat[0].data[3].value += u.jumlah_jiwa;
+        else if (u.kelompok_usia.includes("Lansia")) newStat[0].data[4].value += u.jumlah_jiwa;
+      });
+      dusun.pendidikans?.forEach(p => {
+        if (p.tingkat_pendidikan.includes("SD")) newStat[1].data[0].value += p.jumlah_jiwa;
+        else if (p.tingkat_pendidikan.includes("SMP")) newStat[1].data[1].value += p.jumlah_jiwa;
+        else if (p.tingkat_pendidikan.includes("SMA")) newStat[1].data[2].value += p.jumlah_jiwa;
+        else if (p.tingkat_pendidikan.includes("Sarjana")) newStat[1].data[3].value += p.jumlah_jiwa;
+        else newStat[1].data[4].value += p.jumlah_jiwa;
+      });
+      dusun.pekerjaans?.forEach(pk => {
+        if (pk.jenis_pekerjaan.includes("Petani")) newStat[2].data[0].value += pk.jumlah_jiwa;
+        else if (pk.jenis_pekerjaan.includes("Nelayan")) newStat[2].data[1].value += pk.jumlah_jiwa;
+        else if (pk.jenis_pekerjaan.includes("PNS") || pk.jenis_pekerjaan.includes("TNI")) newStat[2].data[2].value += pk.jumlah_jiwa;
+        else if (pk.jenis_pekerjaan.includes("Wiraswasta")) newStat[2].data[3].value += pk.jumlah_jiwa;
+        else newStat[2].data[4].value += pk.jumlah_jiwa;
+      });
+      dusun.agamas?.forEach(a => {
+        if (a.agama === "Kristen") newStat[3].data[0].value += a.jumlah_jiwa;
+        else if (a.agama === "Islam") newStat[3].data[1].value += a.jumlah_jiwa;
+        else if (a.agama === "Katolik") newStat[3].data[2].value += a.jumlah_jiwa;
+        else newStat[3].data[3].value += a.jumlah_jiwa;
+      });
+      dusun.perkawinans?.forEach(w => {
+        if (w.status_perkawinan === "Kawin") newStat[4].data[0].value += w.jumlah_jiwa;
+        else if (w.status_perkawinan === "Belum Kawin") newStat[4].data[1].value += w.jumlah_jiwa;
+        else newStat[4].data[2].value += w.jumlah_jiwa;
+      });
+    });
+
+    newStat.forEach(item => {
+      const sum = item.data.reduce((s, d) => s + d.value, 0);
+      item.total = sum.toLocaleString("id-ID");
+    });
+    setDisplayData(newStat);
+  }, [rawData, selectedDusun]);
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(to bottom, #2d6e49 0%, #3a9e6a 18%, #4EA674 32%, #ffffff 55%, #c8e6d4 72%, #8fcfaa 85%, #4EA674 100%)",
-        fontFamily: "'Segoe UI', sans-serif",
-      }}
-    >
-      {/* ── HERO HEADER ──────────────────────────────────────────── */}
-      <div
-        style={{
-          textAlign: "center",
-          padding: "72px 32px 48px",
-          position: "relative",
-        }}
-      >
-        {/* Decorative blobs */}
-        <div
-          style={{
-            position: "absolute",
-            top: 20,
-            left: "10%",
-            width: 200,
-            height: 200,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.05)",
-            filter: "blur(40px)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: 40,
-            right: "12%",
-            width: 160,
-            height: 160,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.07)",
-            filter: "blur(30px)",
-            pointerEvents: "none",
-          }}
-        />
+    <div style={{ minHeight: "100vh", background: "#f8fafc", fontFamily: "'Segoe UI', sans-serif" }}>
 
-        <h1
-          style={{
-            fontSize: 52,
-            fontWeight: 800,
-            color: "#fff",
-            marginBottom: 12,
-            fontFamily: "'Georgia', 'Times New Roman', serif",
-            fontStyle: "italic",
-            textShadow: "0 2px 20px rgba(0,0,0,0.15)",
-            position: "relative",
-          }}
-        >
-          Infografis
-        </h1>
-        <p
-          style={{
-            fontSize: 14,
-            color: "rgba(255,255,255,0.75)",
-            fontWeight: 400,
-            position: "relative",
-          }}
-        >
-          Pengantar tentang infografis
-        </p>
-      </div>
+      {/* ── HEADER & SECTION USIA (GABUNG DALAM SATU GRADASI) ── */}
+      <div style={{
+        position: "relative",
+        overflow: "hidden",
+        background: "linear-gradient(135deg, #57A677 0%, #4EA674 100%)",
+      }}>
+        {/* BLOBS (Efek Bola Warna Utama) */}
+        <div style={{ position: "absolute", top: "10%", left: "-100px", width: "600px", height: "600px", background: "rgba(59, 130, 246, 0.4)", borderRadius: "50%", filter: "blur(130px)", pointerEvents: "none" }}></div>
+        <div style={{ position: "absolute", bottom: "10%", right: "-100px", width: "700px", height: "700px", background: "rgba(29, 78, 216, 0.35)", borderRadius: "50%", filter: "blur(150px)", pointerEvents: "none" }}></div>
+        <div style={{ position: "absolute", top: "5%", right: "20%", width: "500px", height: "500px", background: "rgba(110, 231, 183, 0.25)", borderRadius: "50%", filter: "blur(110px)", pointerEvents: "none" }}></div>
 
-      {/* ── DECORATIVE IMAGE STRIP (top area background blur effect) ── */}
-      <div
-        style={{
-          maxWidth: 1000,
-          margin: "0 auto 16px",
-          padding: "0 32px",
-        }}
-      >
-        <div
-          style={{
-            height: 160,
-            borderRadius: 16,
-            background:
-              "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            backdropFilter: "blur(8px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            overflow: "hidden",
-            position: "relative",
-          }}
-        >
-          {/* Decorative pattern */}
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                position: "absolute",
-                width: 80 + i * 20,
-                height: 80 + i * 20,
-                borderRadius: "50%",
-                border: "1px solid rgba(255,255,255,0.06)",
-                top: "50%",
-                left: `${10 + i * 12}%`,
-                transform: "translate(-50%, -50%)",
-              }}
-            />
-          ))}
-          <span
-            style={{
-              color: "rgba(255,255,255,0.3)",
-              fontSize: 13,
-              fontStyle: "italic",
-              zIndex: 1,
-            }}
-          >
-            Desa Sibarani Nasampulu — Data Kependudukan
-          </span>
+        {/* 1. HERO TITLE */}
+        <div style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "110px 32px 60px" }}>
+          <h1 style={{ fontSize: 58, fontWeight: 900, color: "#fff", marginBottom: 16, fontFamily: "'Georgia', serif", fontStyle: "italic", textShadow: "0 3px 15px rgba(0,0,0,0.25)" }}>Infografis</h1>
+          <p style={{ fontSize: 18, color: "rgba(255,255,255,0.95)", fontWeight: 600, maxWidth: "700px", margin: "0 auto", letterSpacing: "0.5px" }}>Data Statistik Kependudukan Desa Sibarani Nasampulu Secara Terpadu & Realtime</p>
         </div>
+
+        {/* 2. STATISTIK USIA (Ditempatkan langsung di sini agar tidak terpotong) */}
+        {displayData.length > 0 && (
+          <StatSection
+            item={displayData[0]}
+            index={0}
+            dusunList={rawData}
+            selectedDusun={selectedDusun}
+            setSelectedDusun={setSelectedDusun}
+            isCombined={true}
+          />
+        )}
       </div>
 
-      {/* ── STATISTIK SECTIONS ───────────────────────────────────── */}
-      {statistikData.map((item, index) => (
-        <React.Fragment key={item.id}>
-          <StatSection item={item} index={index} />
-          {index < statistikData.length - 1 && <Divider index={index} />}
-        </React.Fragment>
+      {/* ── SECTIONS SISANYA (Individu) ── */}
+      {displayData.slice(1).map((item, index) => (
+        <StatSection
+          key={item.id}
+          item={item}
+          index={index + 1}
+          dusunList={rawData}
+          selectedDusun={selectedDusun}
+          setSelectedDusun={setSelectedDusun}
+          isCombined={false}
+        />
       ))}
 
-      {/* ── FOOTER ───────────────────────────────────────────────── */}
-      {/* ── FOOTER ───────────────────────────────────────────────── */}
-      <footer
-        style={{ background: "#0f1f17", fontFamily: "'Segoe UI', sans-serif" }}
-      >
-        {/* Main footer content */}
-        <div
-          style={{
-            maxWidth: 1100,
-            margin: "0 auto",
-            padding: "56px 40px 40px",
-            display: "flex",
-            gap: 48,
-            flexWrap: "wrap",
-          }}
-        >
-          {/* Kolom 1 — Nama Desa */}
-          <div style={{ flex: "1 1 260px", minWidth: 220 }}>
-            <h3
-              style={{
-                fontSize: 20,
-                fontWeight: 800,
-                color: "#fff",
-                marginBottom: 16,
-                lineHeight: 1.3,
-              }}
-            >
-              Desa Sibarani Nasampulu
-            </h3>
-            <p
-              style={{
-                fontSize: 13,
-                color: "rgba(255,255,255,0.5)",
-                lineHeight: 1.8,
-              }}
-            >
-              Website Resmi Pemerintah Desa Sibarani Nasampulu,
-              <br />
-              Kecamatan Laguboti, Kabupaten Toba Samosir, Provinsi
-              <br />
-              Sumatera Utara.
-            </p>
+      {/* ── FOOTER ── */}
+      <footer style={{ background: "#111827", color: "rgba(255,255,255,0.5)", padding: "70px 40px", textAlign: "center", fontSize: "14px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "35px", marginBottom: "35px" }}>
+             <h3 style={{ color: "#fff", fontSize: "22px", fontWeight: "bold", marginBottom: "12px" }}>Desa Sibarani Nasampulu</h3>
+             <p style={{ opacity: 0.8 }}>Kecamatan Laguboti, Kabupaten Toba Samosir, Sumatera Utara</p>
           </div>
-
-          {/* Kolom 2 — Tautan Cepat */}
-          <div style={{ flex: "1 1 200px", minWidth: 160 }}>
-            <h4
-              style={{
-                fontSize: 15,
-                fontWeight: 700,
-                color: "#fff",
-                marginBottom: 8,
-              }}
-            >
-              Tautan Cepat
-            </h4>
-            <div
-              style={{
-                width: 40,
-                height: 3,
-                background: "#4EA674",
-                borderRadius: 2,
-                marginBottom: 20,
-              }}
-            />
-            {[
-              "Profil Desa",
-              "Galeri Kegiatan",
-              "Data IDM",
-              "Berita Terkini",
-              "PPID & Dokumentasi",
-            ].map((link) => (
-              <a
-                key={link}
-                href="#"
-                style={{
-                  display: "block",
-                  fontSize: 13,
-                  color: "rgba(255,255,255,0.55)",
-                  textDecoration: "none",
-                  marginBottom: 12,
-                  transition: "color 0.2s",
-                }}
-                onMouseEnter={(e) => (e.target.style.color = "#4EA674")}
-                onMouseLeave={(e) =>
-                  (e.target.style.color = "rgba(255,255,255,0.55)")
-                }
-              >
-                {link}
-              </a>
-            ))}
-          </div>
-
-          {/* Kolom 3 — Hubungi Kami */}
-          <div style={{ flex: "1 1 260px", minWidth: 220 }}>
-            <h4
-              style={{
-                fontSize: 15,
-                fontWeight: 700,
-                color: "#fff",
-                marginBottom: 8,
-              }}
-            >
-              Hubungi Kami
-            </h4>
-            <div
-              style={{
-                width: 40,
-                height: 3,
-                background: "#4EA674",
-                borderRadius: 2,
-                marginBottom: 20,
-              }}
-            />
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div
-                style={{ display: "flex", alignItems: "flex-start", gap: 12 }}
-              >
-                <span style={{ color: "#4EA674", fontSize: 16, marginTop: 2 }}>
-                  📍
-                </span>
-                <span
-                  style={{
-                    fontSize: 13,
-                    color: "rgba(255,255,255,0.55)",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Kecamatan Laguboti, Kabupaten Toba Samosir,
-                  <br />
-                  Sumatera Utara
-                </span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ color: "#4EA674", fontSize: 16 }}>✉</span>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
-                  pemdes@sibaraninasampulu.go.id
-                </span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ color: "#4EA674", fontSize: 16 }}>📞</span>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
-                  (0632) 123456
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div
-            style={{
-              maxWidth: 1100,
-              margin: "0 auto",
-              padding: "20px 40px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 12,
-            }}
-          >
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-              © 2026 Pemerintah Desa Sibarani Nasampulu. Hak Cipta Dilindungi.
-            </span>
-            <div style={{ display: "flex", gap: 24 }}>
-              {["Facebook", "Instagram", "YouTube"].map((s) => (
-                <a
-                  key={s}
-                  href="#"
-                  style={{
-                    fontSize: 12,
-                    color: "rgba(255,255,255,0.45)",
-                    textDecoration: "none",
-                    transition: "color 0.2s",
-                  }}
-                  onMouseEnter={(e) => (e.target.style.color = "#4EA674")}
-                  onMouseLeave={(e) =>
-                    (e.target.style.color = "rgba(255,255,255,0.45)")
-                  }
-                >
-                  {s}
-                </a>
-              ))}
-            </div>
-          </div>
+          <p>© {new Date().getFullYear()} Pemerintah Desa Sibarani Nasampulu. Seluruh data kependudukan diperbarui secara dinamis oleh sistem desa.</p>
         </div>
       </footer>
     </div>
