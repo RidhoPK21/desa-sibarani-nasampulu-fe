@@ -1,44 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-
-const daftarKegiatan = [
-    { id: 1, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-    { id: 2, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-    { id: 3, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-    { id: 4, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-    { id: 5, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-    { id: 6, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-    { id: 7, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-    { id: 8, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-    { id: 9, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-    { id: 10, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' }
-  ];
-
-const daftarProgramKerja = [
-  { id: 1, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 2, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 3, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 4, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 5, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 6, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 7, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 8, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 9, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 10, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' }
-];
-
-const daftarBantuan = [
-  { id: 1, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 2, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 3, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 4, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 5, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 6, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 7, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 8, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 9, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' },
-  { id: 10, judul: 'Judul Kegiatan', deskripsi: 'Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu Keterangan jumlah yang beragama muslim, kristen, katolik, budha, hindu, dan konghucu' }
-];
+import { infoApi } from '../../services/api';
 
 export default function Kegiatan() {
   const [activeTab, setActiveTab] = useState('kegiatan');
@@ -47,29 +9,65 @@ export default function Kegiatan() {
   const [currentPageBantuan, setCurrentPageBantuan] = useState(1);
   const itemsPerPage = 3;
 
-  // Hitung pagination untuk Kegiatan Desa
+  // --- STATE UNTUK DATA API ---
+  const [semuaKegiatan, setSemuaKegiatan] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // --- MENGAMBIL DATA DARI BACKEND ---
+  useEffect(() => {
+    const fetchKegiatan = async () => {
+      try {
+        setLoading(true);
+        // GET ke endpoint /info/kegiatan
+        const response = await infoApi.get('/kegiatan'); 
+        // Menyimpan data array kegiatan
+        setSemuaKegiatan(response.data.data || []);
+      } catch (error) {
+        console.error("Gagal mengambil data kegiatan:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchKegiatan();
+  }, []);
+
+  // --- MEMFILTER DATA BERDASARKAN JENIS KEGIATAN ---
+  const daftarKegiatan = useMemo(() => 
+    semuaKegiatan.filter(k => k.jenis_kegiatan === 'kegiatan kerja'), [semuaKegiatan]
+  );
+  const daftarProgramKerja = useMemo(() => 
+    semuaKegiatan.filter(k => k.jenis_kegiatan === 'program kerja'), [semuaKegiatan]
+  );
+  const daftarBantuan = useMemo(() => 
+    semuaKegiatan.filter(k => k.jenis_kegiatan === 'bantuan sosial'), [semuaKegiatan]
+  );
+
+  // --- HITUNG PAGINATION ---
+  // Pagination untuk Kegiatan Desa
   const totalPages = Math.ceil(daftarKegiatan.length / itemsPerPage);
   const paginatedData = useMemo(() => {
     const startIdx = (currentPage - 1) * itemsPerPage;
     return daftarKegiatan.slice(startIdx, startIdx + itemsPerPage);
-  }, [currentPage]);
+  }, [currentPage, daftarKegiatan]);
 
-  // Hitung pagination untuk Program Kerja
+  // Pagination untuk Program Kerja
   const totalPagesProgram = Math.ceil(daftarProgramKerja.length / itemsPerPage);
   const paginatedProgramData = useMemo(() => {
     const startIdx = (currentPageProgram - 1) * itemsPerPage;
     return daftarProgramKerja.slice(startIdx, startIdx + itemsPerPage);
-  }, [currentPageProgram]);
+  }, [currentPageProgram, daftarProgramKerja]);
 
-  // Hitung pagination untuk Bantuan Sosial
+  // Pagination untuk Bantuan Sosial
   const totalPagesBantuan = Math.ceil(daftarBantuan.length / itemsPerPage);
   const paginatedBantuanData = useMemo(() => {
     const startIdx = (currentPageBantuan - 1) * itemsPerPage;
     return daftarBantuan.slice(startIdx, startIdx + itemsPerPage);
-  }, [currentPageBantuan]);
+  }, [currentPageBantuan, daftarBantuan]);
 
   // Generate page numbers untuk display
   const getPageNumbers = (totalPg, currentPg) => {
+    if (totalPg === 0) return [1];
+    
     const pages = [];
     const maxVisible = 5;
     let startPage = Math.max(1, currentPg - Math.floor(maxVisible / 2));
@@ -151,282 +149,340 @@ export default function Kegiatan() {
       {/* --- CONTENT SECTION --- */}
       <section className="py-12 px-4 flex-grow">
         <div className="max-w-5xl mx-auto">
-          {/* Daftar Kegiatan Desa Tab */}
+          
+          {/* ========================================= */}
+          {/* TAB 1: Daftar Kegiatan Desa */}
+          {/* ========================================= */}
           {activeTab === 'kegiatan' && (
             <>
               <div className="space-y-6">
-                {paginatedData.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                  <div className="flex gap-6">
-                    {/* Gambar Placeholder */}
-                    <div className="flex-shrink-0">
-                      <div 
-                        className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center"
-                        style={{ minWidth: '128px' }}
-                      >
-                        <img 
-                          src="/kegiatan-image.jpg" 
-                          alt={item.judul}
-                          className="w-full h-full object-cover rounded-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.parentElement.innerHTML = '<span className="text-gray-400 text-sm">Gambar</span>';
-                          }}
-                        />
+                {loading ? (
+                  <div className="bg-white rounded-lg shadow-sm p-10 text-center text-gray-500 font-medium">Memuat data...</div>
+                ) : paginatedData.length === 0 ? (
+                  <div className="bg-white rounded-lg shadow-sm p-10 text-center text-gray-500 font-medium">Belum ada Kegiatan Desa yang terdaftar.</div>
+                ) : (
+                  paginatedData.map((item) => (
+                    <div key={item.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col md:flex-row gap-6">
+                        {/* Gambar */}
+                        <div className="flex-shrink-0">
+                          <div 
+                            className="w-full md:w-40 h-48 md:h-32 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden"
+                            style={{ minWidth: '160px' }}
+                          >
+                            <img 
+                              src={item.gambar_url || "/kegiatan-image.jpg"} 
+                              alt={item.judul_kegiatan}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.parentElement.innerHTML = '<span class="text-gray-400 text-sm">Tanpa Gambar</span>';
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-grow">
+                          <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
+                            <h3 className="text-lg font-bold text-gray-800">
+                              {item.judul_kegiatan}
+                            </h3>
+                            <span className="text-xs font-semibold px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full">
+                              {item.status_kegiatan}
+                            </span>
+                          </div>
+                          
+                          <p className="text-emerald-600 text-xs font-semibold mb-3">
+                             📅 {item.tanggal_pelaksana}
+                          </p>
+
+                          <p className="text-gray-500 text-sm leading-relaxed whitespace-pre-line">
+                            {item.deskripsi_kegiatan || 'Tidak ada deskripsi.'}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  ))
+                )}
+              </div>
+              
+              {/* Pagination Kegiatan */}
+              {totalPages > 1 && (
+                <div className="mt-12 flex justify-center">
+                  <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm overflow-x-auto">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 rounded text-white font-semibold transition-all whitespace-nowrap"
+                      style={{
+                        background: currentPage === 1 ? '#ccc' : '#4EA674',
+                        cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      &larr; Prev
+                    </button>
 
-                    {/* Content */}
-                    <div className="flex-grow">
-                      <h3 className="text-lg font-semibold mb-2" style={{ color: '#666' }}>
-                        {item.judul}
-                      </h3>
-                      <p className="text-gray-500 text-sm leading-relaxed">
-                        {item.deskripsi}
-                      </p>
+                    <div className="flex items-center gap-1">
+                      {getPageNumbers(totalPages, currentPage).map((page, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                          disabled={page === '...'}
+                          className="px-3 py-2 rounded font-semibold transition-all"
+                          style={{
+                            background: page === currentPage ? '#4EA674' : 'transparent',
+                            color: page === currentPage ? 'white' : '#4EA674',
+                            border: page === currentPage ? 'none' : `1px solid #4EA674`,
+                            cursor: page === '...' ? 'default' : 'pointer',
+                            opacity: page === '...' ? 0.5 : 1
+                          }}
+                        >
+                          {page}
+                        </button>
+                      ))}
                     </div>
+
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2 rounded text-white font-semibold transition-all whitespace-nowrap"
+                      style={{
+                        background: currentPage === totalPages ? '#ccc' : '#4EA674',
+                        cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      Next &rarr;
+                    </button>
                   </div>
                 </div>
-              ))}
-              </div>
-              <div className="mt-12 flex justify-center">
-                <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm">
-                  {/* Previous Button */}
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 rounded text-white font-semibold transition-all"
-                    style={{
-                      background: currentPage === 1 ? '#ccc' : '#4EA674',
-                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    &larr; Previous
-                  </button>
-
-                  {/* Page Numbers */}
-                  <div className="flex items-center gap-1">
-                    {getPageNumbers(totalPages, currentPage).map((page, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                        disabled={page === '...'}
-                        className="px-3 py-2 rounded font-semibold transition-all"
-                        style={{
-                          background: page === currentPage ? '#4EA674' : page === '...' ? 'transparent' : 'transparent',
-                          color: page === currentPage ? 'white' : '#4EA674',
-                          border: page === currentPage ? 'none' : `1px solid #4EA674`,
-                          cursor: page === '...' ? 'default' : 'pointer',
-                          opacity: page === '...' ? 0.5 : 1
-                        }}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Next Button */}
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 rounded text-white font-semibold transition-all"
-                    style={{
-                      background: currentPage === totalPages ? '#ccc' : '#4EA674',
-                      cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    Next &rarr;
-                  </button>
-                </div>
-              </div>
+              )}
             </>
           )}
 
-          {/* Daftar Program Kerja Tab */}
+          {/* ========================================= */}
+          {/* TAB 2: Daftar Program Kerja */}
+          {/* ========================================= */}
           {activeTab === 'program' && (
             <>
               <div className="space-y-6">
-                {paginatedProgramData.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                  <div className="flex gap-6">
-                    {/* Gambar Placeholder */}
-                    <div className="flex-shrink-0">
-                      <div 
-                        className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center"
-                        style={{ minWidth: '128px' }}
-                      >
-                        <img 
-                          src="/kegiatan-image.jpg" 
-                          alt={item.judul}
-                          className="w-full h-full object-cover rounded-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.parentElement.innerHTML = '<span className="text-gray-400 text-sm">Gambar</span>';
-                          }}
-                        />
+                {loading ? (
+                  <div className="bg-white rounded-lg shadow-sm p-10 text-center text-gray-500 font-medium">Memuat data...</div>
+                ) : paginatedProgramData.length === 0 ? (
+                  <div className="bg-white rounded-lg shadow-sm p-10 text-center text-gray-500 font-medium">Belum ada Program Kerja yang terdaftar.</div>
+                ) : (
+                  paginatedProgramData.map((item) => (
+                    <div key={item.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col md:flex-row gap-6">
+                        {/* Gambar */}
+                        <div className="flex-shrink-0">
+                          <div 
+                            className="w-full md:w-40 h-48 md:h-32 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden"
+                            style={{ minWidth: '160px' }}
+                          >
+                            <img 
+                              src={item.gambar_url || "/kegiatan-image.jpg"} 
+                              alt={item.judul_kegiatan}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.parentElement.innerHTML = '<span class="text-gray-400 text-sm">Tanpa Gambar</span>';
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-grow">
+                          <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
+                            <h3 className="text-lg font-bold text-gray-800">
+                              {item.judul_kegiatan}
+                            </h3>
+                            <span className="text-xs font-semibold px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                              {item.status_kegiatan}
+                            </span>
+                          </div>
+                          
+                          <p className="text-blue-600 text-xs font-semibold mb-3">
+                             📅 {item.tanggal_pelaksana}
+                          </p>
+
+                          <p className="text-gray-500 text-sm leading-relaxed whitespace-pre-line">
+                            {item.deskripsi_kegiatan || 'Tidak ada deskripsi.'}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  ))
+                )}  
+              </div>
+              
+              {/* Pagination Program Kerja */}
+              {totalPagesProgram > 1 && (
+                <div className="mt-12 flex justify-center">
+                  <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm overflow-x-auto">
+                    <button
+                      onClick={() => setCurrentPageProgram(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPageProgram === 1}
+                      className="px-4 py-2 rounded text-white font-semibold transition-all whitespace-nowrap"
+                      style={{
+                        background: currentPageProgram === 1 ? '#ccc' : '#4EA674',
+                        cursor: currentPageProgram === 1 ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      &larr; Prev
+                    </button>
 
-                    {/* Content */}
-                    <div className="flex-grow">
-                      <h3 className="text-lg font-semibold mb-2" style={{ color: '#666' }}>
-                        {item.judul}
-                      </h3>
-                      <p className="text-gray-500 text-sm leading-relaxed">
-                        {item.deskripsi}
-                      </p>
+                    <div className="flex items-center gap-1">
+                      {getPageNumbers(totalPagesProgram, currentPageProgram).map((page, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => typeof page === 'number' && setCurrentPageProgram(page)}
+                          disabled={page === '...'}
+                          className="px-3 py-2 rounded font-semibold transition-all"
+                          style={{
+                            background: page === currentPageProgram ? '#4EA674' : 'transparent',
+                            color: page === currentPageProgram ? 'white' : '#4EA674',
+                            border: page === currentPageProgram ? 'none' : `1px solid #4EA674`,
+                            cursor: page === '...' ? 'default' : 'pointer',
+                            opacity: page === '...' ? 0.5 : 1
+                          }}
+                        >
+                          {page}
+                        </button>
+                      ))}
                     </div>
+
+                    <button
+                      onClick={() => setCurrentPageProgram(prev => Math.min(prev + 1, totalPagesProgram))}
+                      disabled={currentPageProgram === totalPagesProgram}
+                      className="px-4 py-2 rounded text-white font-semibold transition-all whitespace-nowrap"
+                      style={{
+                        background: currentPageProgram === totalPagesProgram ? '#ccc' : '#4EA674',
+                        cursor: currentPageProgram === totalPagesProgram ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      Next &rarr;
+                    </button>
                   </div>
                 </div>
-              ))}  
-              </div>
-              <div className="mt-12 flex justify-center">
-                <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm">
-                  {/* Previous Button */}
-                  <button
-                    onClick={() => setCurrentPageProgram(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPageProgram === 1}
-                    className="px-4 py-2 rounded text-white font-semibold transition-all"
-                    style={{
-                      background: currentPageProgram === 1 ? '#ccc' : '#4EA674',
-                      cursor: currentPageProgram === 1 ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    &larr; Previous
-                  </button>
-
-                  {/* Page Numbers */}
-                  <div className="flex items-center gap-1">
-                    {getPageNumbers(totalPagesProgram, currentPageProgram).map((page, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => typeof page === 'number' && setCurrentPageProgram(page)}
-                        disabled={page === '...'}
-                        className="px-3 py-2 rounded font-semibold transition-all"
-                        style={{
-                          background: page === currentPageProgram ? '#4EA674' : page === '...' ? 'transparent' : 'transparent',
-                          color: page === currentPageProgram ? 'white' : '#4EA674',
-                          border: page === currentPageProgram ? 'none' : `1px solid #4EA674`,
-                          cursor: page === '...' ? 'default' : 'pointer',
-                          opacity: page === '...' ? 0.5 : 1
-                        }}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Next Button */}
-                  <button
-                    onClick={() => setCurrentPageProgram(prev => Math.min(prev + 1, totalPagesProgram))}
-                    disabled={currentPageProgram === totalPagesProgram}
-                    className="px-4 py-2 rounded text-white font-semibold transition-all"
-                    style={{
-                      background: currentPageProgram === totalPagesProgram ? '#ccc' : '#4EA674',
-                      cursor: currentPageProgram === totalPagesProgram ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    Next &rarr;
-                  </button>
-                </div>
-              </div>
+              )}
             </>
           )}
 
-          {/* Daftar Bantuan Sosial Tab */}
+          {/* ========================================= */}
+          {/* TAB 3: Daftar Bantuan Sosial */}
+          {/* ========================================= */}
           {activeTab === 'bantuan' && (
             <>
               <div className="space-y-6">
-                {paginatedBantuanData.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                  <div className="flex gap-6">
-                    {/* Gambar Placeholder */}
-                    <div className="flex-shrink-0">
-                      <div 
-                        className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center"
-                        style={{ minWidth: '128px' }}
-                      >
-                        <img 
-                          src="/kegiatan-image.jpg" 
-                          alt={item.judul}
-                          className="w-full h-full object-cover rounded-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.parentElement.innerHTML = '<span className="text-gray-400 text-sm">Gambar</span>';
-                          }}
-                        />
+                {loading ? (
+                  <div className="bg-white rounded-lg shadow-sm p-10 text-center text-gray-500 font-medium">Memuat data...</div>
+                ) : paginatedBantuanData.length === 0 ? (
+                  <div className="bg-white rounded-lg shadow-sm p-10 text-center text-gray-500 font-medium">Belum ada Bantuan Sosial yang terdaftar.</div>
+                ) : (
+                  paginatedBantuanData.map((item) => (
+                    <div key={item.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col md:flex-row gap-6">
+                        {/* Gambar */}
+                        <div className="flex-shrink-0">
+                          <div 
+                            className="w-full md:w-40 h-48 md:h-32 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden"
+                            style={{ minWidth: '160px' }}
+                          >
+                            <img 
+                              src={item.gambar_url || "/kegiatan-image.jpg"} 
+                              alt={item.judul_kegiatan}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.parentElement.innerHTML = '<span class="text-gray-400 text-sm">Tanpa Gambar</span>';
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-grow">
+                          <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
+                            <h3 className="text-lg font-bold text-gray-800">
+                              {item.judul_kegiatan}
+                            </h3>
+                            <span className="text-xs font-semibold px-2 py-1 bg-amber-100 text-amber-700 rounded-full">
+                              {item.status_kegiatan}
+                            </span>
+                          </div>
+                          
+                          <p className="text-amber-600 text-xs font-semibold mb-3">
+                             📅 {item.tanggal_pelaksana}
+                          </p>
+
+                          <p className="text-gray-500 text-sm leading-relaxed whitespace-pre-line">
+                            {item.deskripsi_kegiatan || 'Tidak ada deskripsi.'}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  ))
+                )}  
+              </div>
+              
+              {/* Pagination Bantuan Sosial */}
+              {totalPagesBantuan > 1 && (
+                <div className="mt-12 flex justify-center">
+                  <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm overflow-x-auto">
+                    <button
+                      onClick={() => setCurrentPageBantuan(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPageBantuan === 1}
+                      className="px-4 py-2 rounded text-white font-semibold transition-all whitespace-nowrap"
+                      style={{
+                        background: currentPageBantuan === 1 ? '#ccc' : '#4EA674',
+                        cursor: currentPageBantuan === 1 ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      &larr; Prev
+                    </button>
 
-                    {/* Content */}
-                    <div className="flex-grow">
-                      <h3 className="text-lg font-semibold mb-2" style={{ color: '#666' }}>
-                        {item.judul}
-                      </h3>
-                      <p className="text-gray-500 text-sm leading-relaxed">
-                        {item.deskripsi}
-                      </p>
+                    <div className="flex items-center gap-1">
+                      {getPageNumbers(totalPagesBantuan, currentPageBantuan).map((page, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => typeof page === 'number' && setCurrentPageBantuan(page)}
+                          disabled={page === '...'}
+                          className="px-3 py-2 rounded font-semibold transition-all"
+                          style={{
+                            background: page === currentPageBantuan ? '#4EA674' : 'transparent',
+                            color: page === currentPageBantuan ? 'white' : '#4EA674',
+                            border: page === currentPageBantuan ? 'none' : `1px solid #4EA674`,
+                            cursor: page === '...' ? 'default' : 'pointer',
+                            opacity: page === '...' ? 0.5 : 1
+                          }}
+                        >
+                          {page}
+                        </button>
+                      ))}
                     </div>
+
+                    <button
+                      onClick={() => setCurrentPageBantuan(prev => Math.min(prev + 1, totalPagesBantuan))}
+                      disabled={currentPageBantuan === totalPagesBantuan}
+                      className="px-4 py-2 rounded text-white font-semibold transition-all whitespace-nowrap"
+                      style={{
+                        background: currentPageBantuan === totalPagesBantuan ? '#ccc' : '#4EA674',
+                        cursor: currentPageBantuan === totalPagesBantuan ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      Next &rarr;
+                    </button>
                   </div>
                 </div>
-              ))}  
-              </div>
-              <div className="mt-12 flex justify-center">
-                <div className="flex items-center gap-2 p-4 bg-white rounded-lg shadow-sm">
-                  {/* Previous Button */}
-                  <button
-                    onClick={() => setCurrentPageBantuan(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPageBantuan === 1}
-                    className="px-4 py-2 rounded text-white font-semibold transition-all"
-                    style={{
-                      background: currentPageBantuan === 1 ? '#ccc' : '#4EA674',
-                      cursor: currentPageBantuan === 1 ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    &larr; Previous
-                  </button>
-
-                  {/* Page Numbers */}
-                  <div className="flex items-center gap-1">
-                    {getPageNumbers(totalPagesBantuan, currentPageBantuan).map((page, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => typeof page === 'number' && setCurrentPageBantuan(page)}
-                        disabled={page === '...'}
-                        className="px-3 py-2 rounded font-semibold transition-all"
-                        style={{
-                          background: page === currentPageBantuan ? '#4EA674' : page === '...' ? 'transparent' : 'transparent',
-                          color: page === currentPageBantuan ? 'white' : '#4EA674',
-                          border: page === currentPageBantuan ? 'none' : `1px solid #4EA674`,
-                          cursor: page === '...' ? 'default' : 'pointer',
-                          opacity: page === '...' ? 0.5 : 1
-                        }}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Next Button */}
-                  <button
-                    onClick={() => setCurrentPageBantuan(prev => Math.min(prev + 1, totalPagesBantuan))}
-                    disabled={currentPageBantuan === totalPagesBantuan}
-                    className="px-4 py-2 rounded text-white font-semibold transition-all"
-                    style={{
-                      background: currentPageBantuan === totalPagesBantuan ? '#ccc' : '#4EA674',
-                      cursor: currentPageBantuan === totalPagesBantuan ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    Next &rarr;
-                  </button>
-                </div>
-              </div>
+              )}
             </>
           )}
         </div>
       </section>
 
-      {/* --- FOOTER SECTION dengan EMBLEM --- */}
+      {/* --- FOOTER SECTION --- */}
       <footer className="bg-gray-900 text-white pt-16 pb-8 mt-auto">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
@@ -470,17 +526,14 @@ export default function Kegiatan() {
               </h4>
               <ul className="space-y-4 text-sm text-gray-400">
                 <li className="flex items-start gap-3 justify-center md:justify-start">
-                  {/* Icon Lokasi */}
                   <svg className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#4EA674' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                   <span>Kecamatan Laguboti, Kabupaten Toba Samosir, Sumatera Utara</span>
                 </li>
                 <li className="flex items-center gap-3 justify-center md:justify-start">
-                  {/* Icon Email */}
                   <svg className="w-5 h-5 shrink-0" style={{ color: '#4EA674' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                   <span>pemdes@sibaraninasampulu.go.id</span>
                 </li>
                 <li className="flex items-center gap-3 justify-center md:justify-start">
-                  {/* Icon Telepon */}
                   <svg className="w-5 h-5 shrink-0" style={{ color: '#4EA674' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                   <span>(0632) 123456</span>
                 </li>
@@ -489,7 +542,6 @@ export default function Kegiatan() {
 
           </div>
 
-          {/* Copyright Bottom */}
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 text-center md:text-left">
             <p>&copy; {new Date().getFullYear()} Pemerintah Desa Sibarani Nasampulu. Hak Cipta Dilindungi.</p>
             <div className="mt-4 md:mt-0 flex space-x-6">
