@@ -11,6 +11,7 @@ import Pemerintahan from "./pages/public/Pemerintahan";
 import InformasiPublik from "./pages/public/InformasiPublik";
 import Kegiatan from "./pages/public/Kegiatan";
 import Galeri from "./pages/public/Galeri";
+import Ppid from "./pages/public/Ppid"; 
 import Login from "./pages/public/Login";
 
 // Pages: Admin (Dashboard & Fitur)
@@ -19,7 +20,7 @@ import Infografis from "./pages/admin/Infografis";
 import KegiatanDesa from "./pages/admin/KegiatanDesa"; 
 import Berita from "./pages/admin/Berita"; 
 import APBdes from "./pages/admin/APBdes"; 
-import Ppid from "./pages/admin/Ppid"; 
+import AdminPpid from "./pages/admin/Ppid"; 
 import Idm from "./pages/admin/Idm"; 
 
 export default function App() {
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="informasi-publik" element={<InformasiPublik />} />
           <Route path="kegiatan" element={<Kegiatan />} />
           <Route path="galeri" element={<Galeri />} />
+          <Route path="dokumentasi" element={<Ppid />} />
         </Route>
 
         {/* LOGIN Route */}
@@ -52,7 +54,7 @@ export default function App() {
           <Route path="kegiatan" element={<KegiatanDesa />} />
           <Route path="berita" element={<Berita />} />
           <Route path="apbdes" element={<APBdes />} />
-          <Route path="ppid" element={<Ppid />} />
+          <Route path="ppid" element={<AdminPpid />} />
           <Route path="idm" element={<Idm />} />
         </Route>
 
