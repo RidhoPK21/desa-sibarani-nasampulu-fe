@@ -1,127 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { infoApi } from "../../services/api";
 
-// --- DATA ---
-const apbdesData = {
-  2024: {
-    pelaksanaan: {
-      pendapatan: 1488196197,
-      belanja: 1266720597,
-      pembiayaan: 221475600,
-    },
-    pendapatan: {
-      total: 1488196197,
-      rincian: [
-        { label: "Pendapatan Asli Desa", nilai: 1488196197 },
-        { label: "Dana Desa", nilai: 1266720597 },
-        { label: "Alokasi Dana Desa", nilai: 221475600 },
-        { label: "Bagi Hasil Pajak dan Retribusi", nilai: 221475600 },
-        { label: "Lain-Lain Pendapatan Desa Yang Sah", nilai: 221475600 },
-      ],
-    },
-    belanja: {
-      total: 1266720597,
-      rincian: [
-        {
-          label: "Bidang Penyelenggaraan Pemerintahan Desa",
-          nilai: 1488196197,
-        },
-        { label: "Bidang Pelaksanaan Pembangunan Desa", nilai: 1266720597 },
-        { label: "Bidang Pembinaan Kemasyarakatan", nilai: 221475600 },
-        { label: "Bidang Pemberdayaan Masyarakat", nilai: 221475600 },
-        {
-          label: "Bidang Penanggulangan Bencana, Darurat dan Keadaan Mendesak",
-          nilai: 221475600,
-        },
-      ],
-    },
-    pembiayaan: { total: 221475600 },
-    dokumen: {
-      nama: "APBDes 2024",
-      deskripsi: "Deskripsi/Rangkuman Dokumen",
-      tanggal: "Tanggal Dokumen diupload",
-    },
-  },
-  2025: {
-    pelaksanaan: {
-      pendapatan: 1550000000,
-      belanja: 1320000000,
-      pembiayaan: 230000000,
-    },
-    pendapatan: {
-      total: 1550000000,
-      rincian: [
-        { label: "Pendapatan Asli Desa", nilai: 1550000000 },
-        { label: "Dana Desa", nilai: 1320000000 },
-        { label: "Alokasi Dana Desa", nilai: 230000000 },
-        { label: "Bagi Hasil Pajak dan Retribusi", nilai: 230000000 },
-        { label: "Lain-Lain Pendapatan Desa Yang Sah", nilai: 230000000 },
-      ],
-    },
-    belanja: {
-      total: 1320000000,
-      rincian: [
-        {
-          label: "Bidang Penyelenggaraan Pemerintahan Desa",
-          nilai: 1550000000,
-        },
-        { label: "Bidang Pelaksanaan Pembangunan Desa", nilai: 1320000000 },
-        { label: "Bidang Pembinaan Kemasyarakatan", nilai: 230000000 },
-        { label: "Bidang Pemberdayaan Masyarakat", nilai: 230000000 },
-        {
-          label: "Bidang Penanggulangan Bencana, Darurat dan Keadaan Mendesak",
-          nilai: 230000000,
-        },
-      ],
-    },
-    pembiayaan: { total: 230000000 },
-    dokumen: {
-      nama: "APBDes 2025",
-      deskripsi: "Deskripsi/Rangkuman Dokumen",
-      tanggal: "Tanggal Dokumen diupload",
-    },
-  },
-  2026: {
-    pelaksanaan: {
-      pendapatan: 1620000000,
-      belanja: 1390000000,
-      pembiayaan: 245000000,
-    },
-    pendapatan: {
-      total: 1620000000,
-      rincian: [
-        { label: "Pendapatan Asli Desa", nilai: 1620000000 },
-        { label: "Dana Desa", nilai: 1390000000 },
-        { label: "Alokasi Dana Desa", nilai: 245000000 },
-        { label: "Bagi Hasil Pajak dan Retribusi", nilai: 245000000 },
-        { label: "Lain-Lain Pendapatan Desa Yang Sah", nilai: 245000000 },
-      ],
-    },
-    belanja: {
-      total: 1390000000,
-      rincian: [
-        {
-          label: "Bidang Penyelenggaraan Pemerintahan Desa",
-          nilai: 1620000000,
-        },
-        { label: "Bidang Pelaksanaan Pembangunan Desa", nilai: 1390000000 },
-        { label: "Bidang Pembinaan Kemasyarakatan", nilai: 245000000 },
-        { label: "Bidang Pemberdayaan Masyarakat", nilai: 245000000 },
-        {
-          label: "Bidang Penanggulangan Bencana, Darurat dan Keadaan Mendesak",
-          nilai: 245000000,
-        },
-      ],
-    },
-    pembiayaan: { total: 245000000 },
-    dokumen: {
-      nama: "APBDes 2026",
-      deskripsi: "Deskripsi/Rangkuman Dokumen",
-      tanggal: "Tanggal Dokumen diupload",
-    },
-  },
-};
-
-const formatRupiah = (angka) => "Rp " + angka.toLocaleString("id-ID");
+const formatRupiah = (angka) => "Rp " + (angka || 0).toLocaleString("id-ID");
 
 // Icons
 const IconCalendar = () => (
@@ -211,8 +91,168 @@ const IconClock = () => (
 );
 
 export default function APBdes() {
-  const [tahun, setTahun] = useState(2024);
+  const [apbdesData, setApbdesData] = useState({});
+  const [tahunList, setTahunList] = useState([]);
+  const [tahun, setTahun] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await infoApi.get("/apbdes");
+      if (response.data.status === "success") {
+        const raw = response.data.data;
+        const processed = {};
+        const yearsSeen = new Set();
+        const years = [];
+
+        raw.forEach((item) => {
+          // Hanya ambil versi terbaru untuk setiap tahun (karena sudah di-sort di backend)
+          if (yearsSeen.has(item.tahun)) return;
+          yearsSeen.add(item.tahun);
+          years.push(item.tahun);
+
+          // Hitung Rincian Belanja per Bidang
+          const b1 =
+            Number(item.siltap_kepala_desa) +
+            Number(item.siltap_perangkat_desa) +
+            Number(item.jaminan_sosial_aparatur) +
+            Number(item.operasional_pemerintahan_desa) +
+            Number(item.tunjangan_bpd) +
+            Number(item.operasional_bpd) +
+            Number(item.operasional_dana_desa) +
+            Number(item.sarana_prasarana_kantor) +
+            Number(item.pengisian_mutasi_perangkat);
+
+          const b2 =
+            Number(item.penyuluhan_pendidikan) +
+            Number(item.sarana_prasarana_pendidikan) +
+            Number(item.sarana_prasarana_perpustakaan) +
+            Number(item.pengelolaan_perpustakaan) +
+            Number(item.penyelenggaraan_posyandu) +
+            Number(item.penyuluhan_kesehatan) +
+            Number(item.pemeliharaan_jalan_lingkungan) +
+            Number(item.pembangunan_jalan_desa) +
+            Number(item.pembangunan_jalan_usaha_tani) +
+            Number(item.dokumen_tata_ruang) +
+            Number(item.talud_irigasi) +
+            Number(item.sanitasi_pemukiman) +
+            Number(item.fasilitas_pengelolaan_sampah) +
+            Number(item.jaringan_internet_desa);
+
+          const b3 = Number(item.pembinaan_pkk);
+
+          const b4 =
+            Number(item.pelatihan_pertanian_peternakan) +
+            Number(item.pelatihan_aparatur_desa) +
+            Number(item.penyusunan_rencana_program) +
+            Number(item.insentif_kader_pembangunan) +
+            Number(item.insentif_kader_kesehatan_paud);
+
+          const b5 =
+            Number(item.penanggulangan_bencana) + Number(item.keadaan_mendesak);
+
+          const pembiayaanNetto =
+            Number(item.silpa_tahun_sebelumnya) -
+            Number(item.penyertaan_modal_desa);
+
+          processed[item.tahun] = {
+            pelaksanaan: {
+              pendapatan: Number(item.total_pendapatan),
+              belanja: Number(item.total_belanja),
+              pembiayaan: pembiayaanNetto,
+            },
+            pendapatan: {
+              total: Number(item.total_pendapatan),
+              rincian: [
+                {
+                  label: "Pendapatan Asli Desa",
+                  nilai: Number(item.pendapatan_asli_desa),
+                },
+                { label: "Dana Desa", nilai: Number(item.dana_desa) },
+                {
+                  label: "Alokasi Dana Desa",
+                  nilai: Number(item.alokasi_dana_desa),
+                },
+                {
+                  label: "Bagi Hasil Pajak dan Retribusi",
+                  nilai: Number(item.bagi_hasil_pajak_retribusi),
+                },
+                {
+                  label: "Lain-Lain Pendapatan Desa Yang Sah",
+                  nilai: Number(item.lain_lain_pendapatan_sah),
+                },
+              ],
+            },
+            belanja: {
+              total: Number(item.total_belanja),
+              rincian: [
+                {
+                  label: "Bidang Penyelenggaraan Pemerintahan Desa",
+                  nilai: b1,
+                },
+                { label: "Bidang Pelaksanaan Pembangunan Desa", nilai: b2 },
+                { label: "Bidang Pembinaan Kemasyarakatan", nilai: b3 },
+                { label: "Bidang Pemberdayaan Masyarakat", nilai: b4 },
+                {
+                  label:
+                    "Bidang Penanggulangan Bencana, Darurat dan Keadaan Mendesak",
+                  nilai: b5,
+                },
+              ],
+            },
+            pembiayaan: { total: pembiayaanNetto },
+            dokumen: {
+              nama: `APBDes ${item.tahun} (Versi ${item.versi})`,
+              deskripsi: item.alasan_perubahan || "Dokumen APBDes Aktif",
+              tanggal: new Date(item.updated_at).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }),
+              file_url: item.file_url,
+            },
+          };
+        });
+
+        setApbdesData(processed);
+        setTahunList(years.sort((a, b) => b - a));
+        if (years.length > 0) setTahun(years[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching APBDes data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const data = apbdesData[tahun];
+
+  if (loading) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "#4EA674" }}
+      >
+        <div className="text-white font-bold animate-pulse">Memuat Data...</div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "#4EA674" }}
+      >
+        <div className="text-white font-bold">Data APBDes Belum Tersedia.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#4EA674" }}>
@@ -231,14 +271,14 @@ export default function APBdes() {
         </div>
 
         {/* Year Tabs */}
-        <div className="flex gap-0 mb-6 border-b border-white/30">
-          {[2024, 2025, 2026].map((y) => {
+        <div className="flex gap-0 mb-6 border-b border-white/30 overflow-x-auto no-scrollbar">
+          {tahunList.map((y) => {
             const isActive = tahun === y;
             return (
               <button
                 key={y}
                 onClick={() => setTahun(y)}
-                className={`flex items-center gap-1.5 px-6 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
+                className={`flex items-center gap-1.5 px-6 py-2.5 text-sm font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
                   isActive
                     ? "text-white border-white"
                     : "text-white/60 border-transparent hover:text-white hover:border-white/40"
@@ -315,7 +355,7 @@ export default function APBdes() {
                 <span className="text-gray-500 uppercase text-xs">
                   {item.label} :
                 </span>
-                <span className="text-gray-700 font-medium whitespace-nowrap ml-4">
+                <span className="text-gray-700 font-medium ml-4">
                   {formatRupiah(item.nilai)}
                 </span>
               </div>
@@ -350,14 +390,25 @@ export default function APBdes() {
               </div>
             </div>
             <div className="flex flex-col gap-2 shrink-0">
-              <button className="flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap">
+              <a
+                href={data.dokumen.file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap ${!data.dokumen.file_url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={(e) => !data.dokumen.file_url && e.preventDefault()}
+              >
                 <IconView />
                 Lihat Berkas
-              </button>
-              <button className="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap">
+              </a>
+              <a
+                href={data.dokumen.file_url}
+                download
+                className={`flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap ${!data.dokumen.file_url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={(e) => !data.dokumen.file_url && e.preventDefault()}
+              >
                 <IconDownload />
                 Unduh
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -374,7 +425,7 @@ export default function APBdes() {
               <p className="text-white font-semibold text-sm">
                 Pemerintah Desa Sibarani Nasampulu
               </p>
-              <p className="text-white/70 text-xs mt-1">Jl.</p>
+              <p className="text-white/70 text-xs mt-1">Jl. Bypass Laguboti</p>
               <p className="text-white/70 text-xs">
                 Desa Sibarani Nasampulu, Kecamatan Laguboti, Kabupaten Toba
               </p>
@@ -386,20 +437,14 @@ export default function APBdes() {
         </div>
         <div className="border-t border-white/10 px-4 py-4 max-w-3xl mx-auto flex justify-between items-center">
           <p className="text-white/50 text-xs">
-            © 2026 Welcome. All right reserved.
+            © 2026 Pemerintah Desa Sibarani Nasampulu.
           </p>
           <div className="flex gap-3">
-            {["Y", "T", "I"].map((s, i) => (
-              <a
-                key={i}
-                href="#"
-                className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white text-xs transition-colors"
-              >
-                {s}
-              </a>
-            ))}
+             <a href="#" className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white text-xs transition-colors">Y</a>
+             <a href="#" className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white text-xs transition-colors">T</a>
+             <a href="#" className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white text-xs transition-colors">I</a>
           </div>
-          <a href="#" className="text-white/60 text-xs hover:text-white">
+          <a href="mailto:admin@sibaraninasampulu.desa.id" className="text-white/60 text-xs hover:text-white">
             Hubungi Kami
           </a>
         </div>
