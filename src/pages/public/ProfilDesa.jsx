@@ -1,15 +1,405 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import { User, MapPin, Building } from "lucide-react";
+
+// Import Asset Gambar Statis
+import logoToba from "../../assets/logo-toba.jpg";
+import strukturOrganisasi from "../../assets/strukturOrganisasi.jpg";
+import peta from "../../assets/peta.jpg";
+
+const API_PROFIL_URL = `${import.meta.env.VITE_API_URL}/info/profil`;
+
 export default function ProfilDesa() {
+  const [visiMisi, setVisiMisi] = useState({
+    visi: "Memuat...",
+    misi: "Memuat...",
+  });
+  const [perangkatList, setPerangkatList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Mengambil data dinamis dari Backend (Tanpa Token karena ini Publik)
+  useEffect(() => {
+    const fetchProfilData = async () => {
+      try {
+        setLoading(true);
+        // Ambil Visi Misi
+        const resVisiMisi = await axios.get(`${API_PROFIL_URL}/visi-misi`);
+        if (resVisiMisi.data.data.length > 0) {
+          setVisiMisi(resVisiMisi.data.data[0]);
+        }
+
+        // Ambil Data Perangkat Desa
+        const resPerangkat = await axios.get(
+          `${API_PROFIL_URL}/perangkat-desa`,
+        );
+        setPerangkatList(resPerangkat.data.data);
+      } catch (error) {
+        console.error("Gagal mengambil data profil:", error);
+        setVisiMisi({
+          visi: "Data visi belum tersedia.",
+          misi: "Data misi belum tersedia.",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfilData();
+  }, []);
+
   return (
-    <div className="max-w-5xl mx-auto py-12 px-6">
-      <h1 className="text-3xl font-bold text-sky-800 border-b-2 border-sky-800 pb-2 mb-6">Profil Desa Sibarani Nasampulu</h1>
-      <div className="bg-white p-8 rounded-xl shadow-sm">
-        <p className="text-gray-700 leading-relaxed mb-4">
-          Halaman ini nantinya akan berisi sejarah desa, visi misi, letak geografis, demografi penduduk, dan potensi desa.
-        </p>
-        <div className="h-64 bg-slate-100 rounded-lg flex items-center justify-center border border-dashed border-slate-300">
-          <span className="text-slate-400">Ruang untuk gambar/peta desa</span>
-        </div>
+    <div className="font-sans text-slate-700 bg-slate-50 min-h-screen ">
+      {/* ========================================== */}
+      {/* WRAPPER SEJARAH & VISI MISI (EFEK BLOB GRADIENT) */}
+      {/* ========================================== */}
+      <div className="relative overflow-hidden bg-[#57A677]">
+        {/* --- EFEK BOLA WARNA (BLOBS) DI BELAKANG --- */}
+        {/* Bola Biru di Kiri (Antara Sejarah & Visi) */}
+        <div className="absolute top-32 -left-20 w-[500px] h-[500px] bg-blue-500/40 rounded-full blur-[120px] pointer-events-none"></div>
+
+        {/* Bola Biru Gelap di Kanan Bawah (Dekat Misi) */}
+        <div className="absolute bottom-20 -right-20 w-[600px] h-[600px] bg-blue-700/30 rounded-full blur-[140px] pointer-events-none"></div>
+
+        {/* Bola Hijau Muda/Kuning di Tengah Atas (Untuk highlight Sejarah) */}
+        <div className="absolute top-10 right-1/4 w-[400px] h-[400px] bg-emerald-300/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+        {/* --- 1. KONTEN SEJARAH DESA --- */}
+        {/* Z-10 memastikan teks berada DI ATAS bola-bola warna tadi */}
+        <section className="relative z-10 pt-28 pb-16 px-6 text-center text-white">
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-black mb-6 drop-shadow-md italic tracking-wide font-serif">
+              Sejarah Desa
+            </h1>
+            <p className="text-sm md:text-base font-medium text-white/90 leading-relaxed">
+              kosong
+            </p>
+          </div>
+        </section>
+
+        {/* --- 2. KONTEN VISI & MISI --- */}
+        <section className="relative z-10 py-16 px-6 max-w-5xl mx-auto text-white">
+          {/* Baris Visi (Teks Kiri, Logo Kanan) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
+            <div className="animate-in fade-in slide-in-from-left-8 duration-700">
+              <h2 className="text-3xl font-normal tracking-wider mb-6">VISI</h2>
+              <div className="font-bold text-lg mb-4 leading-snug">
+                <p>Membangun desa yang sejahtera</p>
+                <p>dan berdaya saing tinggi.</p>
+              </div>
+              <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line">
+                {visiMisi.visi}
+              </p>
+            </div>
+            <div className="flex justify-center md:justify-end animate-in fade-in slide-in-from-right-8 duration-700">
+              <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                <img
+                  src={logoToba}
+                  alt="Logo Toba"
+                  className="w-64 h-64 object-contain"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Baris Misi (Logo Kiri, Teks Kanan) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center pb-20">
+            <div className="flex justify-center md:justify-start order-last md:order-first animate-in fade-in slide-in-from-left-8 duration-700">
+              <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                <img
+                  src={logoToba}
+                  alt="Logo Toba"
+                  className="w-64 h-64 object-contain"
+                />
+              </div>
+            </div>
+            <div className="animate-in fade-in slide-in-from-right-8 duration-700">
+              <h2 className="text-3xl font-normal tracking-wider mb-6">Misi</h2>
+              <div className="font-bold text-lg mb-4 leading-snug">
+                <p>Meningkatkan pelayanan publik dan</p>
+                <p>kesejahteraan masyarakat.</p>
+              </div>
+              <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line">
+                {visiMisi.misi}
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
+
+      {/* ========================================== */}
+      {/* 3. STRUKTUR ORGANISASI (Statis Gambar) */}
+      {/* ========================================== */}
+      <section className="py-20 bg-white px-6 border-y border-slate-100">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-3 mb-10 text-[#4EA674]">
+            <Building size={32} />
+            <h2 className="text-3xl font-black tracking-tight">
+              Struktur Organisasi Pemerintahan
+            </h2>
+          </div>
+
+          <div className="bg-slate-50 p-4 rounded-3xl shadow-sm border border-slate-100 inline-block w-full max-w-5xl">
+            <img
+              src={strukturOrganisasi}
+              alt="Struktur Organisasi Desa"
+              className="w-full h-auto object-contain rounded-2xl"
+              onError={(e) => (e.target.style.display = "none")}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================== */}
+      {/* 4. DATA PERANGKAT DESA (Dinamis & Slider) */}
+      {/* ========================================== */}
+      <section className="py-20 bg-gradient-to-b from-white to-[#4EA674]/10 px-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-black text-[#4EA674] mb-10 px-4">
+            Data Perangkat Desa
+          </h2>
+
+          {loading ? (
+            <div className="flex gap-6 overflow-x-hidden px-4">
+              {[1, 2, 3, 4].map((n) => (
+                <div
+                  key={n}
+                  className="w-64 h-80 bg-slate-200 animate-pulse rounded-3xl shrink-0"
+                ></div>
+              ))}
+            </div>
+          ) : perangkatList.length === 0 ? (
+            <p className="px-4 text-slate-500 italic">
+              Data perangkat desa belum tersedia.
+            </p>
+          ) : (
+            /* Container Horizontal Scroll */
+            <div
+              className="flex overflow-x-auto gap-6 pb-8 px-4 snap-x scrollbar-hide"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {perangkatList.map((item) => (
+                <div
+                  key={item.id}
+                  className="snap-center shrink-0 w-[260px] bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden group hover:-translate-y-2 transition-transform duration-300"
+                >
+                  <div className="h-64 bg-slate-100 relative overflow-hidden">
+                    {item.foto_url ? (
+                      <img
+                        src={item.foto_url}
+                        alt={item.nama}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-slate-300">
+                        <User size={64} />
+                      </div>
+                    )}
+                    {/* Overlay Gradient bawah foto */}
+                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  </div>
+
+                  <div className="p-6 relative bg-white flex flex-col items-center text-center -mt-6 rounded-t-3xl">
+                    <h3 className="font-bold text-slate-800 text-[15px] leading-snug mb-1">
+                      {item.nama}
+                    </h3>
+                    <p className="text-sm font-semibold text-[#4EA674]">
+                      {item.jabatan}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ========================================== */}
+      {/* 5. PETA LOKASI DESA (Statis & Rounded) */}
+      {/* ========================================== */}
+      <section className="py-20 bg-[#4EA674] px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center gap-3 mb-8 text-white">
+            <MapPin size={32} />
+            <h2 className="text-3xl font-black tracking-tight">
+              Peta Lokasi Desa
+            </h2>
+          </div>
+
+          <div className="bg-white rounded-[2rem] p-3 md:p-6 shadow-2xl shadow-green-900/40 relative overflow-hidden">
+            {/* Aksen Garis di sudut */}
+            <div className="absolute top-0 right-0 w-32 h-32 border-t-4 border-r-4 border-[#4EA674]/20 rounded-tr-[2rem] m-4 pointer-events-none"></div>
+
+            <img
+              src={peta}
+              alt="Peta Desa Sibarani Nasampulu"
+              className="w-full h-auto md:h-[500px] object-cover rounded-2xl"
+              onError={(e) => (e.target.style.display = "none")}
+            />
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-gray-900 text-white pt-16 pb-8 mt-auto">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            {/* Kolom 1: Info Desa */}
+            <div className="flex flex-col items-center md:items-start text-center md:text-left">
+              <div className="flex items-center gap-3 mb-4">
+                <img
+                  src="/logo-toba.jpg"
+                  alt="Logo Toba"
+                  className="w-12 h-12 object-contain bg-white rounded-full p-1 shadow-lg"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
+                <h3 className="text-2xl font-bold" style={{ color: "#FFFFFF" }}>
+                  Desa Sibarani Nasampulu
+                </h3>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                Website Resmi Pemerintah Desa Sibarani Nasampulu, Kecamatan
+                Laguboti, Kabupaten Toba Samosir, Provinsi Sumatera Utara.
+              </p>
+            </div>
+
+            {/* Kolom 2: Tautan Cepat */}
+            <div className="flex flex-col items-center md:items-start">
+              <h4
+                className="text-lg font-bold mb-4 border-b-2 pb-1 inline-block"
+                style={{ borderColor: "#4EA674" }}
+              >
+                Tautan Cepat
+              </h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>
+                  <Link to="/profil" className="hover:text-white transition">
+                    Profil Desa
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/kegiatan" className="hover:text-white transition">
+                    Galeri Kegiatan
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/idm" className="hover:text-white transition">
+                    Data IDM
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/berita" className="hover:text-white transition">
+                    Berita Terkini
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/dokumentasi"
+                    className="hover:text-white transition"
+                  >
+                    PPID & Dokumentasi
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Kolom 3: Kontak */}
+            <div className="flex flex-col items-center md:items-start">
+              <h4
+                className="text-lg font-bold mb-4 border-b-2 pb-1 inline-block"
+                style={{ borderColor: "#4EA674" }}
+              >
+                Hubungi Kami
+              </h4>
+              <ul className="space-y-4 text-sm text-gray-400">
+                <li className="flex items-start gap-3 justify-center md:justify-start">
+                  {/* Icon Lokasi */}
+                  <svg
+                    className="w-5 h-5 shrink-0 mt-0.5"
+                    style={{ color: "#4EA674" }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    ></path>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    ></path>
+                  </svg>
+                  <span>
+                    Kecamatan Laguboti, Kabupaten Toba Samosir, Sumatera Utara
+                  </span>
+                </li>
+                <li className="flex items-center gap-3 justify-center md:justify-start">
+                  {/* Icon Email */}
+                  <svg
+                    className="w-5 h-5 shrink-0"
+                    style={{ color: "#4EA674" }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                  <span>pemdes@sibaraninasampulu.go.id</span>
+                </li>
+                <li className="flex items-center gap-3 justify-center md:justify-start">
+                  {/* Icon Telepon */}
+                  <svg
+                    className="w-5 h-5 shrink-0"
+                    style={{ color: "#4EA674" }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    ></path>
+                  </svg>
+                  <span>(0632) 123456</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Copyright Bottom */}
+          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 text-center md:text-left">
+            <p>
+              &copy; {new Date().getFullYear()} Pemerintah Desa Sibarani
+              Nasampulu. Hak Cipta Dilindungi.
+            </p>
+            <div className="mt-4 md:mt-0 flex space-x-6">
+              <a href="#" className="hover:text-white transition">
+                Facebook
+              </a>
+              <a href="#" className="hover:text-white transition">
+                Instagram
+              </a>
+              <a href="#" className="hover:text-white transition">
+                YouTube
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+      
     </div>
   );
 }
