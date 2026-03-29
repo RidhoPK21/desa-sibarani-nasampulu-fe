@@ -12,6 +12,7 @@ import Galeri from "./pages/public/Galeri";
 import APBdes from "./pages/public/APBdes";
 import Ppid from "./pages/public/Ppid";
 import Infografis from "./pages/public/InfografisPublik";
+import Idm from "./pages/public/Idm";
 
 
 
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="apb-desa" element={<APBdes />} />
           <Route path="dokumentasi" element={<Ppid />} />
           <Route path="infografis" element={<Infografis />} />
+          <Route path="idm" element={<Idm />} />
         </Route>
 
         {/* Rute Login Admin (tanpa sidebar)        */}
