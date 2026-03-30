@@ -1,234 +1,284 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { infoApi } from "../../services/api";
+
+const ITEMS_PER_PAGE = 8;
 
 export default function Galeri() {
-  // Data placeholder untuk galeri
-  const galleryItems = [
-    { id: 1, title: "Foto Kegiatan 1" },
-    { id: 2, title: "Foto Kegiatan 2" },
-    { id: 3, title: "Foto Kegiatan 3" },
-    { id: 4, title: "Foto Kegiatan 4" },
-    { id: 5, title: "Foto Kegiatan 5" },
-    { id: 6, title: "Foto Kegiatan 6" },
-    { id: 7, title: "Foto Kegiatan 7" },
-    { id: 8, title: "Foto Kegiatan 8" },
-  ];
+  const [items, setItems] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [displayed, setDisplayed] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("Semua");
+  const [lightbox, setLightbox] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [beritaRes, kegiatanRes] = await Promise.all([
+          infoApi.get("/berita"),
+          infoApi.get("/kegiatan"),
+        ]);
+        const beritaItems = (beritaRes.data?.data || [])
+          .filter((item) => item.gambar_url)
+          .map((item) => ({
+            id: item.id,
+            judul: item.judul,
+            gambar_url: item.gambar_url,
+            tanggal: item.created_at,
+            kategori: "Berita",
+          }));
+        const kegiatanItems = (kegiatanRes.data?.data || [])
+          .filter((item) => item.gambar_url)
+          .map((item) => ({
+            id: item.id,
+            judul: item.judul,
+            gambar_url: item.gambar_url,
+            tanggal: item.created_at,
+            kategori: "Kegiatan",
+          }));
+        const all = [...beritaItems, ...kegiatanItems].sort(
+          (a, b) => new Date(b.tanggal) - new Date(a.tanggal),
+        );
+        setItems(all);
+        setFiltered(all);
+        setDisplayed(all.slice(0, ITEMS_PER_PAGE));
+      } catch (err) {
+        setError("Gagal memuat data galeri. Silakan coba lagi.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleFilter = (kategori) => {
+    setActiveFilter(kategori);
+    setPage(1);
+    const result =
+      kategori === "Semua"
+        ? items
+        : items.filter((i) => i.kategori === kategori);
+    setFiltered(result);
+    setDisplayed(result.slice(0, ITEMS_PER_PAGE));
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    setDisplayed(filtered.slice(0, nextPage * ITEMS_PER_PAGE));
+  };
+
+  const formatTanggal = (dateStr) =>
+    new Date(dateStr).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+  const handleLightboxNav = (direction) => {
+    const idx = filtered.findIndex((item) => item.id === lightbox.id);
+    const newIdx = idx + direction;
+    if (newIdx >= 0 && newIdx < filtered.length) setLightbox(filtered[newIdx]);
+  };
+
+  const hasMore = displayed.length < filtered.length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      {/* Header Section */}
-      <div className="max-w-7xl mx-auto mb-12">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">Galeri Desa</h1>
-        <p className="text-gray-600 text-lg">
-          Kumpulan dokumentasi kegiatan dan momen penting di Desa Sibarani
-          Nasampulu
-        </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-10 text-center">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Galeri Desa Sibarani Nasampulu
+          </h1>
+          <p className="text-gray-500 text-sm">
+            Dokumentasi kegiatan dan berita desa
+          </p>
+        </div>
       </div>
 
-      {/* Gallery Grid */}
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {galleryItems.map((item) => (
-            <div
-              key={item.id}
-              className="group relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 bg-white"
+      <div className="max-w-6xl mx-auto px-4 pt-8">
+        {/* Filter */}
+        <div className="flex gap-2 mb-8">
+          {["Semua", "Berita", "Kegiatan"].map((f) => (
+            <button
+              key={f}
+              onClick={() => handleFilter(f)}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                activeFilter === f
+                  ? "bg-green-600 text-white shadow-sm"
+                  : "bg-white text-gray-600 border border-gray-200 hover:border-green-400 hover:text-green-600"
+              }`}
             >
-              {/* Placeholder Image */}
-              <div className="w-full h-48 bg-gradient-to-br from-green-200 to-green-400 flex items-center justify-center relative">
-                <svg
-                  className="w-16 h-16 text-green-600 opacity-50"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-
-              {/* Overlay & Title */}
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-end">
-                <div className="w-full p-4 bg-gradient-to-t from-black/70 to-transparent text-white opac­ity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <h3 className="text-lg font-semibold">{item.title}</h3>
-                </div>
-              </div>
-            </div>
+              {f}
+              <span className="ml-1 text-xs opacity-70">
+                (
+                {f === "Semua"
+                  ? items.length
+                  : items.filter((i) => i.kategori === f).length}
+                )
+              </span>
+            </button>
           ))}
         </div>
-      </div>
 
-      {/* Info Text */}
-      <div className="max-w-7xl mx-auto mt-16 p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Tentang Galeri Ini
-        </h2>
-        <p className="text-gray-600 leading-relaxed">
-          Galeri ini menampilkan berbagai dokumentasi kegiatan dan momen penting
-          yang terjadi di Desa Sibarani Nasampulu. Setiap foto merepresentasikan
-          cerita dan dedikasi masyarakat desa dalam membangun komunitas yang
-          lebih baik. Foto-foto ini akan terus diperbarui seiring dengan adanya
-          kegiatan dan acara baru di desa kami.
-        </p>
-      </div>
-
-      {/* FOOTER */}
-      <footer className="bg-gray-900 text-white pt-16 pb-8 mt-auto">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-            {/* Kolom 1: Info Desa */}
-            <div className="flex flex-col items-center md:items-start text-center md:text-left">
-              <div className="flex items-center gap-3 mb-4">
-                <img
-                  src="/logo-toba.jpg"
-                  alt="Logo Toba"
-                  className="w-12 h-12 object-contain bg-white rounded-full p-1 shadow-lg"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
-                />
-                <h3 className="text-2xl font-bold" style={{ color: "#FFFFFF" }}>
-                  Desa Sibarani Nasampulu
-                </h3>
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed mb-4">
-                Website Resmi Pemerintah Desa Sibarani Nasampulu, Kecamatan
-                Laguboti, Kabupaten Toba Samosir, Provinsi Sumatera Utara.
-              </p>
-            </div>
-
-            {/* Kolom 2: Tautan Cepat */}
-            <div className="flex flex-col items-center md:items-start">
-              <h4
-                className="text-lg font-bold mb-4 border-b-2 pb-1 inline-block"
-                style={{ borderColor: "#4EA674" }}
-              >
-                Tautan Cepat
-              </h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Profil Desa
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Galeri Kegiatan
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Data IDM
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    Berita Terkini
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
-                    PPID & Dokumentasi
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Kolom 3: Kontak */}
-            <div className="flex flex-col items-center md:items-start">
-              <h4
-                className="text-lg font-bold mb-4 border-b-2 pb-1 inline-block"
-                style={{ borderColor: "#4EA674" }}
-              >
-                Hubungi Kami
-              </h4>
-              <ul className="space-y-4 text-sm text-gray-400">
-                <li className="flex items-start gap-3 justify-center md:justify-start">
-                  <svg
-                    className="w-5 h-5 shrink-0 mt-0.5"
-                    style={{ color: "#4EA674" }}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    ></path>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    ></path>
-                  </svg>
-                  <span>
-                    Kecamatan Laguboti, Kabupaten Toba Samosir, Sumatera Utara
-                  </span>
-                </li>
-                <li className="flex items-center gap-3 justify-center md:justify-start">
-                  <svg
-                    className="w-5 h-5 shrink-0"
-                    style={{ color: "#4EA674" }}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    ></path>
-                  </svg>
-                  <span>pemdes@sibaraninasampulu.go.id</span>
-                </li>
-                <li className="flex items-center gap-3 justify-center md:justify-start">
-                  <svg
-                    className="w-5 h-5 shrink-0"
-                    style={{ color: "#4EA674" }}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    ></path>
-                  </svg>
-                  <span>(0632) 123456</span>
-                </li>
-              </ul>
-            </div>
+        {/* Loading Skeleton */}
+        {loading && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-12">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="aspect-square bg-gray-200 rounded-xl animate-pulse"
+              />
+            ))}
           </div>
+        )}
 
-          {/* Copyright Bottom */}
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 text-center md:text-left">
-            <p>
-              &copy; {new Date().getFullYear()} Pemerintah Desa Sibarani
-              Nasampulu. Hak Cipta Dilindungi.
-            </p>
-            <div className="mt-4 md:mt-0 flex space-x-6">
-              <a href="#" className="hover:text-white transition">
-                Facebook
-              </a>
-              <a href="#" className="hover:text-white transition">
-                Instagram
-              </a>
-              <a href="#" className="hover:text-white transition">
-                YouTube
-              </a>
+        {/* Error */}
+        {error && <div className="text-center py-24 text-red-500">{error}</div>}
+
+        {/* Empty */}
+        {!loading && !error && filtered.length === 0 && (
+          <div className="text-center py-24 text-gray-400">
+            Belum ada foto untuk kategori ini.
+          </div>
+        )}
+
+        {/* Grid Foto */}
+        {!loading && !error && displayed.length > 0 && (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {displayed.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setLightbox(item)}
+                  className="group relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5"
+                >
+                  <div className="aspect-square overflow-hidden bg-gray-100">
+                    <img
+                      src={item.gambar_url}
+                      alt={item.judul}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.src =
+                          "https://placehold.co/400x400?text=Foto+tidak+tersedia";
+                      }}
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                    <div>
+                      <p className="text-white text-xs font-medium line-clamp-2">
+                        {item.judul}
+                      </p>
+                      <span
+                        className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                          item.kategori === "Berita"
+                            ? "bg-blue-500 text-white"
+                            : "bg-green-500 text-white"
+                        }`}
+                      >
+                        {item.kategori}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Tombol Load More */}
+            {hasMore && (
+              <div className="flex justify-center mt-8 mb-12">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-8 py-3 bg-white border border-green-600 text-green-600 rounded-full text-sm font-medium hover:bg-green-600 hover:text-white transition-all shadow-sm"
+                >
+                  Lihat Lebih Banyak ({filtered.length - displayed.length} foto
+                  lagi)
+                </button>
+              </div>
+            )}
+
+            {!hasMore && displayed.length > 0 && (
+              <p className="text-center text-gray-400 text-sm mt-8 mb-12">
+                Semua foto sudah ditampilkan ({filtered.length} foto)
+              </p>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <div
+            className="bg-white rounded-2xl overflow-hidden max-w-2xl w-full shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative">
+              <img
+                src={lightbox.gambar_url}
+                alt={lightbox.judul}
+                className="w-full max-h-[60vh] object-contain bg-gray-100"
+                onError={(e) => {
+                  e.target.src =
+                    "https://placehold.co/800x600?text=Foto+tidak+tersedia";
+                }}
+              />
+              <button
+                onClick={() => handleLightboxNav(-1)}
+                disabled={filtered.findIndex((i) => i.id === lightbox.id) === 0}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white disabled:opacity-30 transition text-lg"
+              >
+                &#8249;
+              </button>
+              <button
+                onClick={() => handleLightboxNav(1)}
+                disabled={
+                  filtered.findIndex((i) => i.id === lightbox.id) ===
+                  filtered.length - 1
+                }
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white disabled:opacity-30 transition text-lg"
+              >
+                &#8250;
+              </button>
+            </div>
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-800 text-sm">
+                  {lightbox.judul}
+                </h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {formatTanggal(lightbox.tanggal)}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                    lightbox.kategori === "Berita"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-green-100 text-green-700"
+                  }`}
+                >
+                  {lightbox.kategori}
+                </span>
+                <button
+                  onClick={() => setLightbox(null)}
+                  className="text-gray-400 hover:text-gray-600 text-lg leading-none"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </footer>
+      )}
     </div>
   );
 }
