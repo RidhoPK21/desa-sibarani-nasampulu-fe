@@ -154,7 +154,7 @@ export default function Idm() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Cari Tahun..."
+                placeholder="Search Tahun..."
                 className="pl-4 pr-10 py-2 w-80 rounded-full border border-gray-200 bg-white focus:outline-none shadow-sm focus:ring-2 ring-emerald-100"
               />
               <Search className="absolute right-3 top-2.5 text-gray-400 w-5 h-5" />

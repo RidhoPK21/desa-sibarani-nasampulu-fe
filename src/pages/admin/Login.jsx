@@ -5,7 +5,7 @@ import axios from "axios";
 import logoDesa from "../../assets/logodesa.png";
 
 // URL API mengarah ke auth-service via API Gateway
-const API_URL = `${import.meta.env.VITE_API_URL}/auth/login`;
+const API_URL = `${import.meta.env.VITE_API_URL}/auth/portal-pemdes`;
 
 export default function Login() {
   const navigate = useNavigate();
