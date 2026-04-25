@@ -13,7 +13,7 @@ import {
 // Pastikan endpoint ini sesuai dengan route api.php Anda (misal: /info/dokumen atau /info/ppid)
 const API_URL = `${import.meta.env.VITE_API_URL}/info/dokumen`;
 
-export default function PpidDesa() {
+export default function Ppid() {
   const [view, setView] = useState("list");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -21,10 +21,10 @@ export default function PpidDesa() {
   const [dokumen, setDokumen] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // STATE DISESUAIKAN DENGAN NAMA KOLOM DOKUMEN (PPID)
+  // 🔥 UPDATE: Ubah nilai default jenis_ppid menjadi "Informasi Berkala"
   const [formData, setFormData] = useState({
     nama_ppid: "",
-    jenis_ppid: "Regulasi",
+    jenis_ppid: "Informasi Berkala",
     deskripsi_ppid: "",
     file: null,
   });
@@ -72,7 +72,7 @@ export default function PpidDesa() {
     setSelectedItem(null);
     setFormData({
       nama_ppid: "",
-      jenis_ppid: "Regulasi",
+      jenis_ppid: "Informasi Berkala", // 🔥 UPDATE DI SINI JUGA
       deskripsi_ppid: "",
       file: null,
     });
@@ -160,7 +160,6 @@ export default function PpidDesa() {
               />
               <Search className="absolute right-3 top-2.5 text-gray-400 w-5 h-5" />
             </div>
-            
           </div>
         </div>
 
@@ -325,17 +324,20 @@ export default function PpidDesa() {
                   <h3 className="text-lg font-bold mb-4 text-teal-900">
                     Jenis PPID
                   </h3>
+                  {/* 🔥 UPDATE: Opsi Enum Disamakan dengan Database */}
                   <select
                     name="jenis_ppid"
                     value={formData.jenis_ppid}
                     onChange={handleInputChange}
                     className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 ring-emerald-100"
                   >
-                    {/* Value harus sama persis dengan Enum di Database */}
-                    <option value="Regulasi">Regulasi</option>
-                    <option value="Laporan Keuangan">Laporan Keuangan</option>
-                    <option value="SK Kades">SK Kades</option>
-                    <option value="Lainnya">Lainnya</option>
+                    <option value="Informasi Berkala">Informasi Berkala</option>
+                    <option value="Informasi Serta Merta">
+                      Informasi Serta Merta
+                    </option>
+                    <option value="Informasi Setiap Saat">
+                      Informasi Setiap Saat
+                    </option>
                   </select>
                 </div>
 

@@ -140,15 +140,6 @@ export default function Navbar() {
               Galeri
             </Link>
           </li>
-          {/* 🔥 UBAH PATH DI SINI (DESKTOP) 🔥 */}
-          <li>
-            <Link
-              to="/admin/login"
-              className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 whitespace-nowrap"
-            >
-              Login
-            </Link>
-          </li>
         </ul>
 
         {/* Tombol Hamburger untuk Mobile */}
@@ -158,7 +149,6 @@ export default function Navbar() {
             className="text-white focus:outline-none focus:ring-2 focus:ring-white rounded p-1"
             aria-label="Toggle Menu"
           >
-            {/* Menggunakan SVG langsung agar tidak perlu install icon library */}
             {isOpen ? (
               // Ikon Silang (Close)
               <svg
@@ -270,14 +260,6 @@ export default function Navbar() {
             className="block px-3 py-2 rounded-md text-base"
           >
             Galeri
-          </Link>
-          {/* 🔥 UBAH PATH DI SINI (MOBILE) 🔥 */}
-          <Link
-            to="/admin/login"
-            onClick={closeMenu}
-            className="block px-3 py-2 rounded-md text-base bg-gray-900 hover:bg-gray-800 text-white font-bold mt-2 shadow-md transition-colors"
-          >
-            Login
           </Link>
         </div>
       )}
