@@ -12,6 +12,8 @@ import {
   PlusCircle,
   LogOut,
   AlertTriangle,
+  Menu, // Tambahan icon Hamburger Menu
+  X, // Tambahan icon Close
 } from "lucide-react";
 
 export default function AdminLayout() {
@@ -20,19 +22,17 @@ export default function AdminLayout() {
   // State untuk mengontrol kemunculan Modal Logout
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // Fungsi untuk Logout (Dieksekusi setelah konfirmasi)
+  // 🔥 STATE BARU: Untuk mengontrol Sidebar di tampilan HP
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Fungsi untuk Logout
   const handleConfirmLogout = () => {
-    // 1. Hapus token dari memori (Kunci pintu)
     localStorage.removeItem("token");
-
-    // 2. Tutup modal
     setShowLogoutModal(false);
-
-    // 3. Lempar (Redirect) ke halaman Beranda Public
     navigate("/");
   };
 
-  // Daftar Menu Utama (Profil Desa sudah dihapus)
+  // Daftar Menu Utama
   const mainMenus = [
     { name: "Dashboard", path: "/admin", icon: <Home size={20} /> },
     {
@@ -52,16 +52,36 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans relative">
+      {/* 🔥 OVERLAY GELAP UNTUK HP (Muncul saat sidebar ditarik keluar) */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-20 md:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)} // Klik di luar area menu untuk menutup
+        />
+      )}
+
       {/* ================= SIDEBAR KIRI ================= */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0 z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+      {/* 🔥 Kelas responsif: fixed (HP) vs md:relative (Laptop), dan animasi translate-x */}
+      <aside
+        className={`fixed md:relative top-0 left-0 h-full w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 z-30 shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
         {/* AREA LOGO */}
-        <div className="p-6 flex justify-center items-center border-b border-gray-100">
+        <div className="p-6 flex justify-between items-center border-b border-gray-100">
           <img
             src={logoDesa}
             alt="Logo Desa"
-            className="h-24 object-contain transition-transform hover:scale-105"
+            className="h-14 md:h-24 object-contain transition-transform hover:scale-105 mx-auto md:mx-0"
           />
+          {/* 🔥 Tombol Tutup Sidebar (Hanya terlihat di HP) */}
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="md:hidden p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg"
+          >
+            <X size={24} />
+          </button>
         </div>
 
         {/* AREA MENU */}
@@ -72,6 +92,7 @@ export default function AdminLayout() {
                 key={menu.name}
                 to={menu.path}
                 end={menu.path === "/admin"}
+                onClick={() => setIsSidebarOpen(false)} // 🔥 Tutup sidebar di HP saat menu diklik
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
                     isActive
@@ -87,12 +108,12 @@ export default function AdminLayout() {
           </nav>
         </div>
 
-        {/* AREA PROFIL USER (Paling Bawah) */}
-        <div className="border-t border-gray-100 p-5 bg-gray-50/50">
+        {/* AREA PROFIL USER */}
+        <div className="border-t border-gray-100 p-5 bg-gray-50/50 mt-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
-                src={me} // Gambar avatar dummy
+                src={me}
                 alt="Admin Profil"
                 className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm"
               />
@@ -106,7 +127,6 @@ export default function AdminLayout() {
               </div>
             </div>
 
-            {/* Tombol yang memicu kemunculan Modal */}
             <button
               onClick={() => setShowLogoutModal(true)}
               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors group"
@@ -122,8 +142,25 @@ export default function AdminLayout() {
       </aside>
 
       {/* ================= KONTEN UTAMA KANAN ================= */}
-      <main className="flex-1 overflow-y-auto bg-gray-50/50 relative">
-        <Outlet />
+      <main className="flex-1 flex flex-col h-full bg-gray-50/50 relative overflow-hidden">
+        {/* 🔥 HEADER KHUSUS HP (Tempat tombol Hamburger) */}
+        <header className="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10 shadow-sm">
+          <div className="flex items-center gap-3">
+            <img src={logoDesa} alt="Logo" className="h-8 object-contain" />
+            <span className="font-bold text-gray-800 text-sm">Panel Admin</span>
+          </div>
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <Menu size={20} />
+          </button>
+        </header>
+
+        {/* Area Outlet / Konten Aktual Halaman */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-8">
+          <Outlet />
+        </div>
       </main>
 
       {/* ================= MODAL KONFIRMASI LOGOUT ================= */}

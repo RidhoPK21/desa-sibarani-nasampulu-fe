@@ -5,8 +5,8 @@ import { User, MapPin, Building } from "lucide-react";
 
 // Import Asset Gambar Statis
 import logoToba from "../../assets/logo-toba.jpg";
-import strukturOrganisasi from "../../assets/strukturOrganisasi.jpg";
-import peta from "../../assets/peta.jpg";
+import strukturOrganisasi from "../../assets/strukturOrganisasi.jpeg";
+import peta from "../../assets/peta.jpeg";
 
 const API_PROFIL_URL = `${import.meta.env.VITE_API_URL}/info/profil`;
 
@@ -67,13 +67,48 @@ export default function ProfilDesa() {
         {/* --- 1. KONTEN SEJARAH DESA --- */}
         {/* Z-10 memastikan teks berada DI ATAS bola-bola warna tadi */}
         <section className="relative z-10 pt-28 pb-16 px-6 text-center text-white">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-black mb-6 drop-shadow-md italic tracking-wide font-serif">
               Sejarah Desa
             </h1>
-            <p className="text-sm md:text-base font-medium text-white/90 leading-relaxed">
-              kosong
-            </p>
+
+            {/* Menggunakan space-y-4 agar ada jarak antar paragraf */}
+            <div className="text-sm md:text-base font-medium text-white/90 leading-relaxed space-y-4 text-justify md:text-center">
+              <p>
+                Sejarah berdirinya Desa Sibarani Nasampulu yang terletak di
+                Kecamatan Laguboti, Kabupaten Toba, berawal dari tradisi membuka
+                perkampungan baru atau <i>mamukka huta</i> oleh seorang leluhur
+                bernama Raja Banggua Sibarani. Pada masa lampau, beliau merintis
+                kawasan tersebut untuk dijadikan wilayah permukiman dan lahan
+                pertanian bagi keluarganya. Dari tempat inilah asal mula
+                kehidupan masyarakat desa tersebut terbentuk dan berkembang
+                menjadi kawasan yang mapan sebagai kampung halaman leluhur atau{" "}
+                <i>bona pasogit</i> bagi marga Sibarani.
+              </p>
+              <p>
+                Penamaan desa ini diambil langsung dari sejarah keluarga dan
+                julukan sang pendiri kampung. Raja Banggua diketahui memiliki
+                lima orang putra, yang kemudian masing-masing putranya tersebut
+                dikaruniai dua orang anak laki-laki. Karena jumlah cucu
+                laki-laki penerus garis keturunan dari Raja Banggua ini genap
+                berjumlah sepuluh orang, masyarakat setempat memberinya gelar
+                kehormatan "Sibarani Nasampulu" yang berarti "Sibarani yang
+                Sepuluh". Gelar inilah yang akhirnya disematkan secara abadi
+                menjadi nama desa tempat ia dan kesepuluh cucunya berdiam.
+              </p>
+              <p>
+                Selain sebagai pusat asal-usul keturunan marga, desa ini juga
+                memiliki peran sebagai saksi bisu pada masa penjajahan kolonial
+                Belanda. Desa Sibarani Nasampulu pernah menjadi jalur
+                perlintasan sekaligus tempat persinggahan bagi Raja
+                Sisingamangaraja XII beserta pasukannya saat melakukan perang
+                gerilya. Peristiwa bersejarah tersebut dibuktikan dengan
+                peninggalan berupa Mual Sisingamangaraja, yaitu sebuah mata air
+                di desa tersebut yang dahulu memancarkan air sebagai sumber
+                kehidupan bagi sang pahlawan nasional beserta pasukannya dan
+                masih dipertahankan sebagai situs sejarah hingga saat ini.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -83,10 +118,7 @@ export default function ProfilDesa() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
             <div className="animate-in fade-in slide-in-from-left-8 duration-700">
               <h2 className="text-3xl font-normal tracking-wider mb-6">VISI</h2>
-              <div className="font-bold text-lg mb-4 leading-snug">
-                <p>Membangun desa yang sejahtera</p>
-                <p>dan berdaya saing tinggi.</p>
-              </div>
+
               <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line">
                 {visiMisi.visi}
               </p>
@@ -115,10 +147,7 @@ export default function ProfilDesa() {
             </div>
             <div className="animate-in fade-in slide-in-from-right-8 duration-700">
               <h2 className="text-3xl font-normal tracking-wider mb-6">Misi</h2>
-              <div className="font-bold text-lg mb-4 leading-snug">
-                <p>Meningkatkan pelayanan publik dan</p>
-                <p>kesejahteraan masyarakat.</p>
-              </div>
+
               <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line">
                 {visiMisi.misi}
               </p>
@@ -233,7 +262,7 @@ export default function ProfilDesa() {
             <img
               src={peta}
               alt="Peta Desa Sibarani Nasampulu"
-              className="w-full h-auto md:h-[500px] object-cover rounded-2xl"
+              className="w-full h-auto md:h-[500px] object-contain rounded-2xl"
               onError={(e) => (e.target.style.display = "none")}
             />
           </div>
@@ -399,7 +428,6 @@ export default function ProfilDesa() {
           </div>
         </div>
       </footer>
-      
     </div>
   );
 }

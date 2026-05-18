@@ -274,7 +274,10 @@ export default function Berita() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/ppid" className="hover:text-white transition">
+                  <Link
+                    to="/dokumentasi"
+                    className="hover:text-white transition"
+                  >
                     PPID & Dokumentasi
                   </Link>
                 </li>

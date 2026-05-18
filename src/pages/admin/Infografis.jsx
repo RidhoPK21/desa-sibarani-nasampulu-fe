@@ -45,11 +45,11 @@ export default function Infografis() {
       { status_perkawinan: "Cerai Mati", jumlah_jiwa: 0 },
     ],
     usias: [
-      { kelompok_usia: "0 - 4 Tahun (Balita)", jumlah_jiwa: 0 },
-      { kelompok_usia: "5 - 14 Tahun (Anak)", jumlah_jiwa: 0 },
-      { kelompok_usia: "15 - 39 Tahun (Pemuda)", jumlah_jiwa: 0 },
-      { kelompok_usia: "40 - 64 Tahun (Dewasa)", jumlah_jiwa: 0 },
-      { kelompok_usia: "65 Tahun Keatas (Lansia)", jumlah_jiwa: 0 },
+      { kelompok_usia: "0 - 5 Tahun", jumlah_jiwa: 0 },
+      { kelompok_usia: "6 - 12 Tahun", jumlah_jiwa: 0 },
+      { kelompok_usia: "13 - 16 Tahun", jumlah_jiwa: 0 },
+      { kelompok_usia: "17 - 64 Tahun", jumlah_jiwa: 0 },
+      { kelompok_usia: "65 Tahun Keatas", jumlah_jiwa: 0 },
     ],
     pendidikans: [
       { tingkat_pendidikan: "Tidak/Belum Sekolah", jumlah_jiwa: 0 },

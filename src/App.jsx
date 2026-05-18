@@ -34,11 +34,11 @@ const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    // Jika tidak ada token, paksa kembali ke halaman login rahasia kita
-    return <Navigate to="/admin/portal-pemdes" replace />;
+    // Alihkan ke rute khusus 404 agar penyerang mengira halaman ini tidak ada
+    // (Penerapan Cloaking / Mencegah Information Leakage)
+    return <Navigate to="/404" replace />;
   }
 
-  // Jika ada token, silakan masuk ke komponen yang dituju
   return children;
 };
 
@@ -49,7 +49,6 @@ export default function App() {
         {/* ======================================= */}
         {/* Rute untuk Warga (Area Publik)          */}
         {/* ======================================= */}
-        {/* Menggunakan PublicLayout dari kode Anda */}
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<Home />} />
           <Route path="profil" element={<ProfilDesa />} />
@@ -62,7 +61,8 @@ export default function App() {
           <Route path="idm" element={<Idm />} />
         </Route>
 
-        {/* Rute Login Admin (tanpa sidebar)        */}
+        {/* ======================================= */}
+        {/* Rute Login Admin Rahasia (tanpa sidebar)*/}
         {/* ======================================= */}
         <Route path="/admin/portal-pemdes" element={<Login />} />
 
@@ -88,18 +88,27 @@ export default function App() {
         </Route>
 
         {/* ======================================= */}
-        {/* Rute jika halaman tidak ditemukan (404) */}
+        {/* Rute Catch-All (404 Not Found)          */}
         {/* ======================================= */}
         <Route
-          path="*"
+          path="/404"
           element={
-            <div className="flex items-center justify-center min-h-screen">
-              <h1 className="text-3xl font-bold text-slate-400">
-                404 - Halaman Tidak Ditemukan
-              </h1>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
+              <h1 className="text-5xl font-bold text-slate-700 mb-4">404</h1>
+              <p className="text-xl text-slate-500 mb-8">
+                Halaman Tidak Ditemukan
+              </p>
+              <a
+                href="/"
+                className="px-6 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition"
+              >
+                Kembali ke Beranda
+              </a>
             </div>
           }
         />
+        {/* Menangkap semua rute salah lainnya dan melempar ke /404 */}
+        <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
     </BrowserRouter>
   );

@@ -248,7 +248,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {beritaTerkini.map((berita) => (
                 <Link
-                  to={`/berita/${berita.id}`}
+                  to="/berita"
                   key={berita.id}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group flex flex-col"
                 >
