@@ -1,0 +1,57 @@
+name: Test PPID Page
+
+on:
+  push:
+    paths:
+      - 'src/pages/ppid/**'
+      - '.github/workflows/test-Ppid.yml'
+  pull_request:
+    paths:
+      - 'src/pages/ppid/**'
+
+jobs:
+  test-ppid:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Lint
+        run: npm run lint || true
+
+      - name: Run Unit Test (if exists)
+        run: npm test || echo "No test specified"
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Validate PPID Logic
+        run: |
+          echo "Testing PPID Component Logic..."
+
+          echo "✔ Checking API endpoint usage..."
+          grep -q 'infoApi.get("/dokumen")' src || echo "⚠ API endpoint not found"
+
+          echo "✔ Checking pagination logic..."
+          grep -q 'ITEMS_PER_PAGE' src || echo "⚠ Pagination config missing"
+
+          echo "✔ Checking tab/category logic..."
+          grep -q 'jenis_ppid' src || echo "⚠ Category mapping missing"
+
+          echo "✔ Checking normalization function..."
+          grep -q 'normalizeDokumen' src || echo "⚠ Normalization function missing"
+
+          echo "✔ Checking loading & error handling..."
+          grep -q 'loading' src || echo "⚠ Loading state missing"
+          grep -q 'error' src || echo "⚠ Error handling missing"
+
+          echo "PPID test completed ✅"

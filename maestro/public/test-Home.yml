@@ -1,0 +1,107 @@
+name: Test Home Page API
+request:
+  method: GET
+  url: "{{base_url}}"
+
+tests:
+  - name: Cek endpoint banner
+    request:
+      method: GET
+      url: "{{base_url}}/content/banner"
+    expect:
+      status: 200
+      body:
+        type: object
+
+  - name: Cek endpoint kata sambutan
+    request:
+      method: GET
+      url: "{{base_url}}/info/profil/kata-sambutan"
+    expect:
+      status: 200
+      body:
+        type: object
+
+  - name: Cek endpoint berita
+    request:
+      method: GET
+      url: "{{base_url}}/info/berita"
+    expect:
+      status: 200
+      body:
+        type: object
+
+  - name: Cek endpoint statistik dusun
+    request:
+      method: GET
+      url: "{{base_url}}/statistic/dusun"
+    expect:
+      status: 200
+      body:
+        type: object
+
+  - name: Validasi struktur data banner
+    request:
+      method: GET
+      url: "{{base_url}}/content/banner"
+    expect:
+      status: 200
+      body:
+        data:
+          type: array
+
+  - name: Validasi struktur berita
+    request:
+      method: GET
+      url: "{{base_url}}/info/berita"
+    expect:
+      status: 200
+      body:
+        data:
+          type: array
+
+  - name: Validasi struktur statistik dusun
+    request:
+      method: GET
+      url: "{{base_url}}/statistic/dusun"
+    expect:
+      status: 200
+      body:
+        data:
+          type: array
+
+  - name: Cek field penting berita
+    request:
+      method: GET
+      url: "{{base_url}}/info/berita"
+    expect:
+      status: 200
+      body:
+        data:
+          - id: any
+            judul: any
+            created_at: any
+
+  - name: Cek field penting banner
+    request:
+      method: GET
+      url: "{{base_url}}/content/banner"
+    expect:
+      status: 200
+      body:
+        data:
+          - id: any
+            nama_banner: any
+            gambar_url: any
+
+  - name: Cek field statistik dusun
+    request:
+      method: GET
+      url: "{{base_url}}/statistic/dusun"
+    expect:
+      status: 200
+      body:
+        data:
+          - total_penduduk: any
+            penduduk_laki: any
+            penduduk_perempuan: any

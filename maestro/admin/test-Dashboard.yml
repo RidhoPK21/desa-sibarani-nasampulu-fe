@@ -1,0 +1,93 @@
+url: http://localhost:5174/
+name: Test Dashboard Admin
+---
+# Buka web
+- openLink: http://localhost:5174/
+
+# Pastikan masuk dashboard
+- assertVisible: Dashboard Admin
+
+# =========================
+# TEST TAB RINGKASAN
+# =========================
+- tapOn: Ringkasan
+- assertVisible: Total Penduduk
+- assertVisible: Status IDM
+
+# =========================
+# TEST TAB KATA SAMBUTAN
+# =========================
+- tapOn: Kata Sambutan
+- assertVisible: Edit Kata Sambutan
+
+# Input kata sambutan
+- tapOn:
+    text: ""
+- inputText: Selamat datang di website resmi Desa Sibarani Nasampulu
+
+# Simpan
+- tapOn: Simpan Kata Sambutan
+
+# =========================
+# TEST TAB VISI MISI
+# =========================
+- tapOn: Visi & Misi
+- assertVisible: Edit Visi & Misi
+
+- tapOn: Visi Desa
+- inputText: Mewujudkan desa maju dan sejahtera
+
+- tapOn: Misi Desa
+- inputText: Meningkatkan kualitas hidup masyarakat desa
+
+- tapOn: Simpan Visi & Misi
+
+# =========================
+# TEST TAB PERANGKAT DESA
+# =========================
+- tapOn: Perangkat Desa
+- assertVisible: Daftar Perangkat Desa
+
+# Klik tambah
+- tapOn: Tambah Aparatur
+
+# Pastikan form muncul
+- assertVisible: Tambah Aparatur Desa Baru
+
+# Input data
+- tapOn: Nama Lengkap
+- inputText: Budi Santoso
+
+- tapOn: Jabatan
+- inputText: Kepala Dusun
+
+# Simpan
+- tapOn: Simpan
+
+# =========================
+# TEST TAB BANNER
+# =========================
+- tapOn: Banner Home
+- assertVisible: Kelola Slider Banner Utama
+
+# Klik tambah banner
+- tapOn: Tambah Banner
+
+# Pastikan form
+- assertVisible: Upload Banner Baru
+
+# Input data
+- tapOn: Nama / Judul Banner
+- inputText: Banner Desa 2026
+
+- tapOn: Urutan Tampil (Opsional)
+- inputText: 1
+
+# Simpan
+- tapOn: Simpan Banner
+
+# =========================
+# SCREENSHOT
+# =========================
+- takeScreenshot:
+    path: results/dashboard_success

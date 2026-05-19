@@ -1,0 +1,56 @@
+url: http://localhost:5174/
+name: Test Tambah APBDes
+---
+# Buka web
+- openLink: http://localhost:5174/
+
+# Pastikan sudah di halaman APBDes
+- assertVisible: Kelola APBDes
+
+# Klik tombol tambah
+- tapOn: Buat APBDes Baru
+
+# Pastikan masuk ke form
+- assertVisible: Input Data APBDes Awal (Versi 1)
+
+# =========================
+# INPUT DATA DASAR
+# =========================
+- tapOn: Nama Desa
+- inputText: Desa Sibarani Nasampulu
+
+- tapOn: Tahun Anggaran
+- inputText: 2026
+
+# =========================
+# INPUT PENDAPATAN
+# =========================
+- tapOn: Pendapatan Asli Desa (PADes)
+- inputText: 10000000
+
+- tapOn: Dana Desa (DD)
+- inputText: 20000000
+
+- tapOn: Alokasi Dana Desa (ADD)
+- inputText: 15000000
+
+# =========================
+# INPUT PEMBIAYAAN
+# =========================
+- tapOn: SILPA Tahun Sebelumnya (Penerimaan)
+- inputText: 5000000
+
+- tapOn: Penyertaan Modal Desa (Pengeluaran)
+- inputText: 2000000
+
+# =========================
+# SIMPAN DATA
+# =========================
+- tapOn: Simpan Data APBDes
+
+# Tunggu balik ke list
+- assertVisible: Daftar APBDes Aktif & Riwayat
+
+# Screenshot hasil
+- takeScreenshot:
+    path: results/apbdes_success

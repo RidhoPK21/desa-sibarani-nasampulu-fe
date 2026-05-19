@@ -1,0 +1,51 @@
+name: PPID Dokumen API Test
+
+base_url: ${VITE_API_URL}/info/dokumen
+
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+
+tests:
+
+  - name: Get All Dokumen PPID
+    request:
+      method: GET
+      url: /
+    expect:
+      status: 200
+
+  - name: Create Dokumen PPID
+    request:
+      method: POST
+      url: /
+      body:
+        type: form-data
+        data:
+          nama_ppid: "Laporan APBDes 2026"
+          jenis_ppid: "Informasi Berkala"
+          deskripsi_ppid: "Dokumen laporan keuangan desa tahun 2026"
+          file: file:./test-dokumen.pdf
+    expect:
+      status: 200
+
+  - name: Update Dokumen PPID
+    request:
+      method: POST
+      url: /{{id}}
+      body:
+        type: form-data
+        data:
+          _method: PUT
+          nama_ppid: "Laporan APBDes 2026 (Revisi)"
+          jenis_ppid: "Informasi Setiap Saat"
+          deskripsi_ppid: "Dokumen revisi laporan keuangan desa"
+    expect:
+      status: 200
+
+  - name: Delete Dokumen PPID
+    request:
+      method: DELETE
+      url: /{{id}}
+    expect:
+      status: 200

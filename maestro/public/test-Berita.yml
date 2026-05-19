@@ -1,0 +1,74 @@
+name: Test API Berita Desa
+
+config:
+  base_url: ${VITE_API_URL}
+
+tests:
+  - name: Ambil semua berita
+    request:
+      method: GET
+      url: /info/berita
+    expected:
+      status_code: 200
+      json:
+        status: success
+
+  - name: Pastikan hanya berita yang dipublish ditampilkan
+    request:
+      method: GET
+      url: /info/berita
+    validate:
+      - type: jsonpath
+        expression: "$.data[*].is_published"
+        expected: true
+
+  - name: Validasi struktur data berita
+    request:
+      method: GET
+      url: /info/berita
+    validate:
+      - type: jsonpath
+        expression: "$.data[0].id"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[0].judul"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[0].konten"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[0].gambar_url"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[0].created_at"
+        exists: true
+
+  - name: Test pagination manual (frontend logic)
+    description: Pastikan data lebih dari 5 item untuk pagination
+    request:
+      method: GET
+      url: /info/berita
+    validate:
+      - type: length
+        expression: "$.data"
+        greater_than: 5
+
+  - name: Validasi format tanggal
+    request:
+      method: GET
+      url: /info/berita
+    validate:
+      - type: regex
+        expression: "$.data[0].created_at"
+        pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}"
+
+  - name: Test jika tidak ada berita dipublish
+    request:
+      method: GET
+      url: /info/berita?published=false
+    expected:
+      status_code: 200
+    validate:
+      - type: length
+        expression: "$.data"
+        equals: 0

@@ -1,0 +1,63 @@
+name: Test IDM API
+
+variables:
+  base_url: {{$dotenv VITE_API_URL}}
+  token: YOUR_TOKEN_HERE
+
+requests:
+  # =========================
+  # GET ALL IDM
+  # =========================
+  - name: Get All IDM
+    method: GET
+    url: "{{base_url}}/statistic/idm"
+    headers:
+      Authorization: Bearer {{token}}
+
+  # =========================
+  # CREATE IDM
+  # =========================
+  - name: Create IDM
+    method: POST
+    url: "{{base_url}}/statistic/idm"
+    headers:
+      Authorization: Bearer {{token}}
+      Content-Type: application/json
+    body:
+      type: json
+      raw:
+        tahun_idm: 2025
+        status_idm: Berkembang
+        score_idm: 0.6789
+        sosial_idm: 0.7000
+        ekonomi_idm: 0.6500
+        lingkungan_idm: 0.6867
+
+  # =========================
+  # UPDATE IDM
+  # =========================
+  - name: Update IDM
+    method: POST
+    url: "{{base_url}}/statistic/idm/ID_HERE"
+    headers:
+      Authorization: Bearer {{token}}
+      Content-Type: application/json
+    body:
+      type: json
+      raw:
+        _method: PUT
+        tahun_idm: 2025
+        status_idm: Maju
+        score_idm: 0.7500
+        sosial_idm: 0.7600
+        ekonomi_idm: 0.7400
+        lingkungan_idm: 0.7500
+
+  # =========================
+  # DELETE IDM
+  # =========================
+  - name: Delete IDM
+    method: DELETE
+    url: "{{base_url}}/statistic/idm/ID_HERE"
+    headers:
+      Authorization: Bearer {{token}}

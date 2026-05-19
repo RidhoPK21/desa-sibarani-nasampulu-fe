@@ -1,0 +1,118 @@
+name: Test API Galeri Desa
+
+config:
+  base_url: ${VITE_API_URL}/info
+
+tests:
+  - name: Ambil data berita untuk galeri
+    request:
+      method: GET
+      url: /berita
+    expected:
+      status_code: 200
+      json:
+        status: success
+
+  - name: Ambil data kegiatan untuk galeri
+    request:
+      method: GET
+      url: /kegiatan
+    expected:
+      status_code: 200
+      json:
+        status: success
+
+  - name: Validasi berita yang memiliki gambar & published
+    request:
+      method: GET
+      url: /berita
+    validate:
+      - type: jsonpath
+        expression: "$.data[?(@.gambar_url != null)].gambar_url"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[?(@.is_published == true || @.is_published == 1)]"
+        exists: true
+
+  - name: Validasi kegiatan memiliki gambar
+    request:
+      method: GET
+      url: /kegiatan
+    validate:
+      - type: jsonpath
+        expression: "$.data[?(@.gambar_url != null)].gambar_url"
+        exists: true
+
+  - name: Validasi struktur data galeri (berita)
+    request:
+      method: GET
+      url: /berita
+    validate:
+      - type: jsonpath
+        expression: "$.data[0].id"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[0].judul"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[0].gambar_url"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[0].created_at"
+        exists: true
+
+  - name: Validasi struktur data galeri (kegiatan)
+    request:
+      method: GET
+      url: /kegiatan
+    validate:
+      - type: jsonpath
+        expression: "$.data[0].id"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[0].nama_kegiatan"
+        exists: true
+      - type: jsonpath
+        expression: "$.data[0].gambar_url"
+        exists: true
+
+  - name: Test penggabungan data (minimal ada data)
+    request:
+      - method: GET
+        url: /berita
+      - method: GET
+        url: /kegiatan
+    validate:
+      - type: length
+        expression: "$[0].data"
+        greater_than: 0
+
+  - name: Validasi sorting tanggal terbaru
+    request:
+      method: GET
+      url: /berita
+    validate:
+      - type: regex
+        expression: "$.data[0].created_at"
+        pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}"
+
+  - name: Test pagination load more (frontend logic)
+    description: Pastikan data lebih dari 8 item
+    request:
+      method: GET
+      url: /berita
+    validate:
+      - type: length
+        expression: "$.data"
+        greater_than: 8
+
+  - name: Test kondisi data kosong
+    request:
+      method: GET
+      url: /berita?empty=true
+    expected:
+      status_code: 200
+    validate:
+      - type: length
+        expression: "$.data"
+        equals: 0

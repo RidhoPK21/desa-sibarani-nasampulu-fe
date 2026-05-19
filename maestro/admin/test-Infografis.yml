@@ -1,0 +1,120 @@
+name: Test Infografis Dusun API
+
+variables:
+  base_url: {{$dotenv VITE_API_URL}}
+  token: YOUR_TOKEN_HERE
+
+requests:
+  # =========================
+  # GET ALL DUSUN
+  # =========================
+  - name: Get All Dusun
+    method: GET
+    url: "{{base_url}}/statistic/dusun"
+    headers:
+      Authorization: Bearer {{token}}
+
+  # =========================
+  # CREATE DUSUN + DEMOGRAFI
+  # =========================
+  - name: Create Dusun
+    method: POST
+    url: "{{base_url}}/statistic/dusun"
+    headers:
+      Authorization: Bearer {{token}}
+      Content-Type: application/json
+    body:
+      type: json
+      raw:
+        id: D01
+        nama_dusun: Dusun 1
+        penduduk_laki: 120
+        penduduk_perempuan: 130
+        agamas:
+          - agama: Islam
+            jumlah_jiwa: 100
+          - agama: Kristen
+            jumlah_jiwa: 150
+          - agama: Katolik
+            jumlah_jiwa: 0
+          - agama: Hindu
+            jumlah_jiwa: 0
+          - agama: Buddha
+            jumlah_jiwa: 0
+        perkawinans:
+          - status_perkawinan: Belum Kawin
+            jumlah_jiwa: 80
+          - status_perkawinan: Kawin
+            jumlah_jiwa: 140
+          - status_perkawinan: Cerai Hidup
+            jumlah_jiwa: 10
+          - status_perkawinan: Cerai Mati
+            jumlah_jiwa: 20
+        usias:
+          - kelompok_usia: 0 - 4 Tahun (Balita)
+            jumlah_jiwa: 30
+          - kelompok_usia: 5 - 14 Tahun (Anak)
+            jumlah_jiwa: 50
+          - kelompok_usia: 15 - 39 Tahun (Pemuda)
+            jumlah_jiwa: 100
+          - kelompok_usia: 40 - 64 Tahun (Dewasa)
+            jumlah_jiwa: 60
+          - kelompok_usia: 65 Tahun Keatas (Lansia)
+            jumlah_jiwa: 10
+        pendidikans:
+          - tingkat_pendidikan: Tidak/Belum Sekolah
+            jumlah_jiwa: 20
+          - tingkat_pendidikan: Tamat SD/Sederajat
+            jumlah_jiwa: 80
+          - tingkat_pendidikan: Tamat SMP/Sederajat
+            jumlah_jiwa: 70
+          - tingkat_pendidikan: Tamat SMA/Sederajat
+            jumlah_jiwa: 60
+          - tingkat_pendidikan: Diploma / Sarjana (S1/S2/S3)
+            jumlah_jiwa: 20
+        pekerjaans:
+          - jenis_pekerjaan: Belum/Tidak Bekerja
+            jumlah_jiwa: 40
+          - jenis_pekerjaan: Mengurus Rumah Tangga
+            jumlah_jiwa: 50
+          - jenis_pekerjaan: Pelajar/Mahasiswa
+            jumlah_jiwa: 60
+          - jenis_pekerjaan: PNS/TNI/Polri
+            jumlah_jiwa: 10
+          - jenis_pekerjaan: Wiraswasta / Pengusaha
+            jumlah_jiwa: 20
+          - jenis_pekerjaan: Karyawan Swasta
+            jumlah_jiwa: 30
+          - jenis_pekerjaan: Petani/Pekebun
+            jumlah_jiwa: 25
+          - jenis_pekerjaan: Buruh Harian Lepas
+            jumlah_jiwa: 10
+          - jenis_pekerjaan: Pekerjaan Lainnya
+            jumlah_jiwa: 5
+
+  # =========================
+  # UPDATE DUSUN
+  # =========================
+  - name: Update Dusun
+    method: POST
+    url: "{{base_url}}/statistic/dusun/D01"
+    headers:
+      Authorization: Bearer {{token}}
+      Content-Type: application/json
+    body:
+      type: json
+      raw:
+        _method: PUT
+        id: D01
+        nama_dusun: Dusun 1 Update
+        penduduk_laki: 150
+        penduduk_perempuan: 140
+
+  # =========================
+  # DELETE DUSUN
+  # =========================
+  - name: Delete Dusun
+    method: DELETE
+    url: "{{base_url}}/statistic/dusun/D01"
+    headers:
+      Authorization: Bearer {{token}}

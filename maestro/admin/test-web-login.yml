@@ -1,0 +1,14 @@
+url: http://localhost:5174/
+name: Login Berhasil
+---
+- launchApp
+- tapOn: "Username"
+- inputText: admin_sibarani
+- tapOn: "Email"
+- inputText: admin@sibaraninasampulu.desa.id
+- tapOn: "Password"
+- inputText: password_desa_2026
+- tapOn: "Masuk"
+- assertVisible: "Selamat Datang di Desa Sibarani Nasampulu"
+- takeScreenshot:
+    path: results/login_success

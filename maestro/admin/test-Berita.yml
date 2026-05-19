@@ -1,0 +1,41 @@
+url: http://localhost:5174/
+name: Test Tambah Berita Desa
+---
+# Buka web
+- openLink: http://localhost:5174/
+
+# Pastikan masuk halaman berita
+- assertVisible: Kelola Berita Desa
+
+# Klik tombol tambah
+- tapOn: Tambah Berita
+
+# Pastikan masuk ke form
+- assertVisible: Detail Berita
+
+# =========================
+# INPUT DATA BERITA
+# =========================
+- tapOn: Judul Berita
+- inputText: Pembangunan Jalan Desa 2026
+
+- tapOn: Isi Berita
+- inputText: Pemerintah desa melakukan pembangunan jalan untuk meningkatkan akses masyarakat.
+
+# =========================
+# PILIH STATUS
+# =========================
+- tapOn: Status Publikasi
+- tapOn: Publish
+
+# =========================
+# SIMPAN DATA
+# =========================
+- tapOn: Simpan
+
+# Kembali ke list
+- assertVisible: Daftar Berita Desa
+
+# Screenshot hasil
+- takeScreenshot:
+    path: results/berita_success

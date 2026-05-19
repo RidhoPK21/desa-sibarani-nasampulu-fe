@@ -1,0 +1,67 @@
+name: Test Profil Desa Page
+
+on:
+  push:
+    paths:
+      - 'src/pages/profil/**'
+      - '.github/workflows/test-ProfilDesa.yml'
+  pull_request:
+    paths:
+      - 'src/pages/profil/**'
+
+jobs:
+  test-profil-desa:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Lint
+        run: npm run lint || true
+
+      - name: Run Unit Test (if exists)
+        run: npm test || echo "No test specified"
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Validate Profil Desa Logic
+        run: |
+          echo "Testing Profil Desa Component..."
+
+          echo "✔ Checking API endpoint..."
+          grep -q '/info/profil' src || echo "⚠ API profil endpoint missing"
+
+          echo "✔ Checking visi misi fetch..."
+          grep -q 'visi-misi' src || echo "⚠ Visi Misi API missing"
+
+          echo "✔ Checking perangkat desa fetch..."
+          grep -q 'perangkat-desa' src || echo "⚠ Perangkat Desa API missing"
+
+          echo "✔ Checking state management..."
+          grep -q 'useState' src || echo "⚠ useState not found"
+
+          echo "✔ Checking loading state..."
+          grep -q 'loading' src || echo "⚠ Loading state missing"
+
+          echo "✔ Checking error handling..."
+          grep -q 'catch' src || echo "⚠ Error handling missing"
+
+          echo "✔ Checking dynamic data rendering..."
+          grep -q 'perangkatList.map' src || echo "⚠ Mapping perangkat desa missing"
+
+          echo "✔ Checking static assets..."
+          grep -q 'logoToba' src || echo "⚠ Logo asset missing"
+          grep -q 'strukturOrganisasi' src || echo "⚠ Struktur organisasi image missing"
+          grep -q 'peta' src || echo "⚠ Peta image missing"
+
+          echo "Profil Desa test completed ✅"

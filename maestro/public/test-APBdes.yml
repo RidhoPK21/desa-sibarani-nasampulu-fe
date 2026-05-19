@@ -1,0 +1,99 @@
+name: APBdes API Test
+
+config:
+  base_url: ${VITE_API_URL}
+
+tests:
+  - name: Get All APBDes Data
+    request:
+      url: /info/apbdes
+      method: GET
+    expected:
+      status_code: 200
+      json:
+        status: success
+
+  - name: Validate APBDes Data Structure
+    request:
+      url: /info/apbdes
+      method: GET
+    expected:
+      status_code: 200
+      json:
+        status: success
+        data:
+          - id: !!int
+            tahun: !!int
+            versi: !!int
+            pendapatan_asli_desa: !!int
+            dana_desa: !!int
+            alokasi_dana_desa: !!int
+            bagi_hasil_pajak_retribusi: !!int
+            lain_lain_pendapatan_sah: !!int
+            siltap_kepala_desa: !!int
+            siltap_perangkat_desa: !!int
+            jaminan_sosial_aparatur: !!int
+            operasional_pemerintahan_desa: !!int
+            tunjangan_bpd: !!int
+            operasional_bpd: !!int
+            operasional_dana_desa: !!int
+            sarana_prasarana_kantor: !!int
+            pengisian_mutasi_perangkat: !!int
+            penyuluhan_pendidikan: !!int
+            sarana_prasarana_pendidikan: !!int
+            sarana_prasarana_perpustakaan: !!int
+            pengelolaan_perpustakaan: !!int
+            penyelenggaraan_posyandu: !!int
+            penyuluhan_kesehatan: !!int
+            pemeliharaan_jalan_lingkungan: !!int
+            pembangunan_jalan_desa: !!int
+            pembangunan_jalan_usaha_tani: !!int
+            dokumen_tata_ruang: !!int
+            talud_irigasi: !!int
+            sanitasi_pemukiman: !!int
+            fasilitas_pengelolaan_sampah: !!int
+            jaringan_internet_desa: !!int
+            pembinaan_pkk: !!int
+            pelatihan_pertanian_peternakan: !!int
+            pelatihan_aparatur_desa: !!int
+            penyusunan_rencana_program: !!int
+            insentif_kader_pembangunan: !!int
+            insentif_kader_kesehatan_paud: !!int
+            penanggulangan_bencana: !!int
+            keadaan_mendesak: !!int
+            silpa_tahun_sebelumnya: !!int
+            penyertaan_modal_desa: !!int
+
+  - name: Validate APBDes Calculation Fields Not Null
+    request:
+      url: /info/apbdes
+      method: GET
+    expected:
+      status_code: 200
+      json:
+        status: success
+    validators:
+      - compare:
+          json.data[0].tahun: gt 2000
+      - compare:
+          json.data[0].versi: ge 1
+
+  - name: Validate Multiple Years Exist
+    request:
+      url: /info/apbdes
+      method: GET
+    expected:
+      status_code: 200
+    validators:
+      - len_gt:
+          json.data: 0
+
+  - name: Validate Versioning Logic
+    request:
+      url: /info/apbdes
+      method: GET
+    expected:
+      status_code: 200
+    validators:
+      - compare:
+          json.data[0].versi: ge 1

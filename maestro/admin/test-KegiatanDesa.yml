@@ -1,0 +1,57 @@
+name: Kegiatan Desa API Test
+
+base_url: ${VITE_API_URL}/info/kegiatan
+
+headers:
+  Authorization: Bearer {{token}}
+  Accept: application/json
+
+tests:
+
+  - name: Get All Kegiatan
+    request:
+      method: GET
+      url: /
+    expect:
+      status: 200
+
+  - name: Create Kegiatan
+    request:
+      method: POST
+      url: /
+      body:
+        type: form-data
+        data:
+          jenis_kegiatan: "kegiatan kerja"
+          judul_kegiatan: "Gotong Royong Desa"
+          deskripsi_kegiatan: "Membersihkan lingkungan desa"
+          tanggal_pelaksana: "2026-04-01"
+          tanggal_berakhir: "2026-04-02"
+          status_kegiatan: "Akan Datang"
+          gambar: file:./test-image.jpg
+    expect:
+      status: 200
+
+  - name: Update Kegiatan
+    request:
+      method: POST
+      url: /{{id}}
+      body:
+        type: form-data
+        data:
+          _method: PUT
+          jenis_kegiatan: "program kerja"
+          judul_kegiatan: "Program Kebersihan Desa"
+          deskripsi_kegiatan: "Update deskripsi kegiatan"
+          tanggal_pelaksana: "2026-04-05"
+          tanggal_berakhir: "2026-04-06"
+          status_kegiatan: "Berlangsung"
+    expect:
+      status: 200
+
+  - name: Delete Kegiatan
+    request:
+      method: DELETE
+      url: /{{id}}
+    expect:
+      status: 200

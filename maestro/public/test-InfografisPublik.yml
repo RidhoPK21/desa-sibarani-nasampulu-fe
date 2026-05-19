@@ -1,0 +1,32 @@
+name: Test Halaman Infografis Publik
+
+on:
+  push:
+    paths:
+      - "src/pages/InfografisPublik.jsx"
+      - "cypress/e2e/test-InfografisPublik.cy.js"
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run App
+        run: npm run dev &
+
+      - name: Wait for App
+        run: npx wait-on http://localhost:5173
+
+      - name: Run Cypress Test Infografis
+        run: npx cypress run --spec "cypress/e2e/test-InfografisPublik.cy.js"
